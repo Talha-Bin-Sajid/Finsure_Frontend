@@ -1,0 +1,179 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "demo@finsure.com",
+      "password": "demo123",
+      "name": "Alex Morgan",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+      "twoFactorEnabled": false
+    }
+  ],
+  "dashboardSummary": {
+    "totalIncome": 125450.00,
+    "totalExpenses": 78230.50,
+    "netProfit": 47219.50,
+    "taxableIncome": 45000.00
+  },
+  "recentUploads": [
+    {
+      "id": "1",
+      "fileName": "invoice_march_2024.pdf",
+      "uploadDate": "2024-03-15T10:30:00",
+      "status": "completed",
+      "fileType": "invoice"
+    },
+    {
+      "id": "2",
+      "fileName": "receipt_office_supplies.jpg",
+      "uploadDate": "2024-03-14T15:45:00",
+      "status": "processing",
+      "fileType": "receipt"
+    },
+    {
+      "id": "3",
+      "fileName": "bank_statement_feb.pdf",
+      "uploadDate": "2024-03-10T09:15:00",
+      "status": "completed",
+      "fileType": "bank_statement"
+    }
+  ],
+  "extractions": [
+    {
+      "id": "1",
+      "fileId": "1",
+      "transactions": [
+        {
+          "id": "t1",
+          "date": "2024-03-01",
+          "description": "Client Payment - Project Alpha",
+          "amount": 5500.00,
+          "category": "income",
+          "taxable": true
+        },
+        {
+          "id": "t2",
+          "date": "2024-03-05",
+          "description": "Office Rent",
+          "amount": -2200.00,
+          "category": "rent",
+          "taxable": false
+        },
+        {
+          "id": "t3",
+          "date": "2024-03-08",
+          "description": "Software Subscriptions",
+          "amount": -450.00,
+          "category": "software",
+          "taxable": true
+        }
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "id": "r1",
+      "title": "Q1 2024 Income vs Expense Report",
+      "generatedDate": "2024-03-20T14:30:00",
+      "type": "income_expense",
+      "dateRange": "2024-01-01 to 2024-03-31"
+    },
+    {
+      "id": "r2",
+      "title": "February 2024 Tax Summary",
+      "generatedDate": "2024-03-01T10:00:00",
+      "type": "tax_summary",
+      "dateRange": "2024-02-01 to 2024-02-29"
+    },
+    {
+      "id": "r3",
+      "title": "2024 Cash Flow Analysis",
+      "generatedDate": "2024-03-15T16:45:00",
+      "type": "cashflow",
+      "dateRange": "2024-01-01 to 2024-03-15"
+    }
+  ],
+  "chartData": {
+    "categoryBreakdown": [
+      { "name": "Income", "value": 125450, "color": "#14e7ff" },
+      { "name": "Rent", "value": 26400, "color": "#0ab6ff" },
+      { "name": "Software", "value": 5400, "color": "#3b82f6" },
+      { "name": "Office Supplies", "value": 3200, "color": "#8b5cf6" },
+      { "name": "Utilities", "value": 1800, "color": "#ec4899" },
+      { "name": "Other", "value": 41430.50, "color": "#f59e0b" }
+    ],
+    "monthlyTrend": [
+      { "month": "Jan", "income": 42000, "expenses": 25000 },
+      { "month": "Feb", "income": 38500, "expenses": 24500 },
+      { "month": "Mar", "income": 44950, "expenses": 28730.50 }
+    ],
+    "cashflow": [
+      { "week": "Week 1", "value": 12500 },
+      { "week": "Week 2", "value": -8200 },
+      { "week": "Week 3", "value": 15800 },
+      { "week": "Week 4", "value": 6500 },
+      { "week": "Week 5", "value": -4300 },
+      { "week": "Week 6", "value": 18900 },
+      { "week": "Week 7", "value": 11200 },
+      { "week": "Week 8", "value": -5200 }
+    ]
+  },
+  "history": [
+    {
+      "id": "h1",
+      "fileName": "invoice_march_2024.pdf",
+      "uploadDate": "2024-03-15T10:30:00",
+      "status": "completed",
+      "fileType": "invoice",
+      "transactionCount": 3,
+      "totalAmount": 5500.00
+    },
+    {
+      "id": "h2",
+      "fileName": "receipt_office_supplies.jpg",
+      "uploadDate": "2024-03-14T15:45:00",
+      "status": "completed",
+      "fileType": "receipt",
+      "transactionCount": 1,
+      "totalAmount": -150.00
+    },
+    {
+      "id": "h3",
+      "fileName": "bank_statement_feb.pdf",
+      "uploadDate": "2024-03-10T09:15:00",
+      "status": "completed",
+      "fileType": "bank_statement",
+      "transactionCount": 45,
+      "totalAmount": 12500.00
+    },
+    {
+      "id": "h4",
+      "fileName": "invoice_client_beta.pdf",
+      "uploadDate": "2024-02-28T11:20:00",
+      "status": "completed",
+      "fileType": "invoice",
+      "transactionCount": 2,
+      "totalAmount": 8900.00
+    }
+  ],
+  "activities": [
+    {
+      "id": "a1",
+      "type": "upload",
+      "message": "Uploaded invoice_march_2024.pdf",
+      "timestamp": "2024-03-15T10:30:00"
+    },
+    {
+      "id": "a2",
+      "type": "report",
+      "message": "Generated Q1 2024 Income vs Expense Report",
+      "timestamp": "2024-03-20T14:30:00"
+    },
+    {
+      "id": "a3",
+      "type": "edit",
+      "message": "Updated transaction categories",
+      "timestamp": "2024-03-14T16:20:00"
+    }
+  ]
+}

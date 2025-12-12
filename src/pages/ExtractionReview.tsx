@@ -1,0 +1,248 @@
+import React, { useState, useEffect } from 'react';
+import { Save, Download, Edit2, Check, X } from 'lucide-react';
+import { mockApi } from '../services/apiClient';
+import { toast } from '../utils/toast';
+
+interface Transaction {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  category: string;
+  taxable: boolean;
+}
+
+export const ExtractionReview: React.FC = () => {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<Partial<Transaction>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const extraction = await mockApi.extractions.getByFileId('1');
+        setTransactions(extraction.transactions);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const categories = [
+    'income',
+    'rent',
+    'software',
+    'office_supplies',
+    'utilities',
+    'travel',
+    'meals',
+    'other'
+  ];
+
+  const startEdit = (transaction: Transaction) => {
+    setEditingId(transaction.id);
+    setEditForm(transaction);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditForm({});
+  };
+
+  const saveEdit = async () => {
+    if (!editingId) return;
+
+    try {
+      await mockApi.extractions.updateTransaction('1', editingId, editForm);
+      setTransactions(transactions.map(t =>
+        t.id === editingId ? { ...t, ...editForm } : t
+      ));
+      toast.success('Transaction updated successfully');
+      cancelEdit();
+    } catch (error) {
+      toast.error('Failed to update transaction');
+    }
+  };
+
+  const exportToCSV = () => {
+    const headers = ['Date', 'Description', 'Amount', 'Category', 'Taxable'];
+    const rows = transactions.map(t => [
+      t.date,
+      t.description,
+      t.amount,
+      t.category,
+      t.taxable
+    ]);
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transactions.csv';
+    a.click();
+    toast.success('Exported to CSV');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#14e7ff]"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-[#e7f0fa]">Extraction Review</h1>
+          <p className="text-[#e7f0fa]/60">
+            Review and edit extracted transaction data
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={exportToCSV}
+            className="flex items-center gap-2 bg-[#151c27] hover:bg-[#14e7ff]/10 text-[#14e7ff] border border-[#14e7ff] px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            <Download size={18} />
+            <span>Export CSV</span>
+          </button>
+          <button
+            className="flex items-center gap-2 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            <Save size={18} />
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-[#0c111a] border-b border-[#14e7ff]/20">
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Date</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Description</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Amount</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Category</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Taxable</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((transaction) => (
+                <tr
+                  key={transaction.id}
+                  className="border-b border-[#14e7ff]/10 hover:bg-[#14e7ff]/5 transition-colors"
+                >
+                  <td className="px-6 py-4 text-[#e7f0fa]">
+                    {editingId === transaction.id ? (
+                      <input
+                        type="date"
+                        value={editForm.date}
+                        onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                        className="bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                      />
+                    ) : (
+                      transaction.date
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-[#e7f0fa]">
+                    {editingId === transaction.id ? (
+                      <input
+                        type="text"
+                        value={editForm.description}
+                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                        className="w-full bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                      />
+                    ) : (
+                      transaction.description
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-[#e7f0fa]">
+                    {editingId === transaction.id ? (
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editForm.amount}
+                        onChange={(e) => setEditForm({ ...editForm, amount: parseFloat(e.target.value) })}
+                        className="w-24 bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                      />
+                    ) : (
+                      <span className={transaction.amount < 0 ? 'text-red-400' : 'text-green-400'}>
+                        ${Math.abs(transaction.amount).toFixed(2)}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-[#e7f0fa]">
+                    {editingId === transaction.id ? (
+                      <select
+                        value={editForm.category}
+                        onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                        className="bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                      >
+                        {categories.map(cat => (
+                          <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="px-2 py-1 bg-[#14e7ff]/10 text-[#14e7ff] rounded text-sm">
+                        {transaction.category.replace('_', ' ')}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {editingId === transaction.id ? (
+                      <input
+                        type="checkbox"
+                        checked={editForm.taxable}
+                        onChange={(e) => setEditForm({ ...editForm, taxable: e.target.checked })}
+                        className="w-4 h-4 accent-[#14e7ff]"
+                      />
+                    ) : (
+                      <span className={`px-2 py-1 rounded text-sm ${
+                        transaction.taxable
+                          ? 'bg-green-400/10 text-green-400'
+                          : 'bg-gray-400/10 text-gray-400'
+                      }`}>
+                        {transaction.taxable ? 'Yes' : 'No'}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {editingId === transaction.id ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={saveEdit}
+                          className="text-green-400 hover:text-green-300 transition-colors"
+                        >
+                          <Check size={20} />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => startEdit(transaction)}
+                        className="text-[#14e7ff] hover:text-[#0ab6ff] transition-colors"
+                      >
+                        <Edit2 size={20} />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
