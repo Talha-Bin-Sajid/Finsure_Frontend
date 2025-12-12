@@ -285,5 +285,3 @@ For questions or issues:
 - Documentation: Browse in-app Help section
 
 ---
-
-**Built with ❤️ using React, TypeScript, and Tailwind CSS**
