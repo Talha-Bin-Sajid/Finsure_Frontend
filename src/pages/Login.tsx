@@ -5,8 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from '../utils/toast';
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState('demo@finsure.com');
-  const [password, setPassword] = useState('demo123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -94,14 +94,6 @@ export const Login: React.FC = () => {
               <Link to="/signup" className="text-[#14e7ff] hover:text-[#0ab6ff] transition-colors">
                 Sign up
               </Link>
-            </p>
-          </div>
-
-          <div className="mt-4 p-4 bg-[#14e7ff]/10 border border-[#14e7ff]/20 rounded-lg">
-            <p className="text-xs text-[#e7f0fa]/80">
-              <strong>Demo credentials:</strong><br />
-              Email: demo@finsure.com<br />
-              Password: demo123
             </p>
           </div>
         </div>

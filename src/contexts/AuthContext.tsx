@@ -1,10 +1,18 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { mockApi } from '../services/apiClient';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
+import { authApi } from '../services/apiClient';
 
 interface User {
-  id: string;
+  userID: string;
   email: string;
   name: string;
+  userType: string;
+  createdAt: string;
   avatar: string;
 }
 
@@ -12,20 +20,33 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
+  signup: (
+    email: string,
+    password: string,
+    name: string,
+    userType: string
+  ) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+// 🔹 Avatar generator (frontend only)
+const generateAvatar = (name: string) =>
+  `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load user on refresh
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     const savedUser = localStorage.getItem('user');
+
     if (token && savedUser) {
       setUser(JSON.parse(savedUser));
     }
@@ -33,22 +54,58 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await mockApi.auth.login(email, password);
-    setUser(response.user);
+    const res = await authApi.login({ email, password });
+
+    const userWithAvatar: User = {
+      ...res.user,
+      avatar: generateAvatar(res.user.name),
+    };
+
+    localStorage.setItem('authToken', res.access_token);
+    localStorage.setItem('user', JSON.stringify(userWithAvatar));
+    setUser(userWithAvatar);
   };
 
-  const signup = async (email: string, password: string, name: string) => {
-    const response = await mockApi.auth.signup(email, password, name);
-    setUser(response.user);
+  const signup = async (
+    email: string,
+    password: string,
+    name: string,
+    userType: string
+  ) => {
+    const res = await authApi.signup({
+      email,
+      password,
+      name,
+      userType,
+    });
+
+    const userWithAvatar: User = {
+      ...res.user,
+      avatar: generateAvatar(res.user.name),
+    };
+
+    localStorage.setItem('authToken', res.access_token);
+    localStorage.setItem('user', JSON.stringify(userWithAvatar));
+    setUser(userWithAvatar);
   };
 
   const logout = () => {
-    mockApi.auth.logout();
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        login,
+        signup,
+        logout,
+        isLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

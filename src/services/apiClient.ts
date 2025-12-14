@@ -1,7 +1,8 @@
 import axios from 'axios';
 import mockData from '../data/mockData.json';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -17,6 +18,25 @@ apiClient.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// 🔹 REAL AUTH API
+export const authApi = {
+  signup: async (data: {
+    name: string;
+    email: string;
+    password: string;
+    userType: string;
+  }) => {
+    const res = await apiClient.post('/api/v1/auth/signup', data);
+    return res.data;
+  },
+
+  login: async (data: { email: string; password: string }) => {
+    const res = await apiClient.post('/api/v1/auth/login', data);
+    return res.data;
+  },
+};
+
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -129,3 +149,4 @@ export const mockApi = {
 };
 
 export default apiClient;
+
