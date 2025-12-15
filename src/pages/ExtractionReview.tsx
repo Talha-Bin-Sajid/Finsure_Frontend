@@ -125,7 +125,6 @@ export const ExtractionReview: React.FC = () => {
             <thead className="bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Description</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Amount</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Category</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Taxable</th>
@@ -150,7 +149,7 @@ export const ExtractionReview: React.FC = () => {
                       transaction.date
                     )}
                   </td>
-                  <td className="px-6 py-4 text-[var(--text-primary)]">
+                  {/* <td className="px-6 py-4 text-[var(--text-primary)]">
                     {editingId === transaction.id ? (
                       <input
                         type="text"
@@ -161,7 +160,7 @@ export const ExtractionReview: React.FC = () => {
                     ) : (
                       transaction.description
                     )}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 text-[var(--text-primary)]">
                     {editingId === transaction.id ? (
                       <input
