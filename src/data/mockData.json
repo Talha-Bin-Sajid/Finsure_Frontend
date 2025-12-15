@@ -93,6 +93,365 @@
       "dateRange": "2024-01-01 to 2024-03-15"
     }
   ],
+  "detailedReports": [
+    {
+      "reportId": "r1",
+      "type": "income_expense",
+      "title": "Q1 2024 Income vs Expense Report",
+      "dateRange": "2024-01-01 to 2024-03-31",
+      "generatedDate": "2024-03-20T14:30:00",
+      "summary": {
+        "totalIncome": 125450.00,
+        "totalExpenses": 78230.50,
+        "netBalance": 47219.50,
+        "profitMargin": 37.6
+      },
+      "transactions": [
+        {
+          "id": "t1",
+          "date": "2024-01-05",
+          "description": "Client Payment - Project Alpha",
+          "category": "Income",
+          "amount": 25000.00,
+          "taxable": true
+        },
+        {
+          "id": "t2",
+          "date": "2024-01-10",
+          "description": "Office Rent",
+          "category": "Rent",
+          "amount": -8000.00,
+          "taxable": false
+        },
+        {
+          "id": "t3",
+          "date": "2024-01-15",
+          "description": "Software Subscriptions",
+          "category": "Software",
+          "amount": -1800.00,
+          "taxable": true
+        },
+        {
+          "id": "t4",
+          "date": "2024-01-20",
+          "description": "Client Payment - Project Beta",
+          "category": "Income",
+          "amount": 32000.00,
+          "taxable": true
+        },
+        {
+          "id": "t5",
+          "date": "2024-01-25",
+          "description": "Utilities",
+          "category": "Utilities",
+          "amount": -600.00,
+          "taxable": false
+        },
+        {
+          "id": "t6",
+          "date": "2024-02-03",
+          "description": "Freelance Invoice Payment",
+          "category": "Income",
+          "amount": 18500.00,
+          "taxable": true
+        },
+        {
+          "id": "t7",
+          "date": "2024-02-08",
+          "description": "Office Rent",
+          "category": "Rent",
+          "amount": -8000.00,
+          "taxable": false
+        },
+        {
+          "id": "t8",
+          "date": "2024-02-12",
+          "description": "Marketing Campaign",
+          "category": "Marketing",
+          "amount": -5200.00,
+          "taxable": true
+        },
+        {
+          "id": "t9",
+          "date": "2024-02-18",
+          "description": "Client Payment - Project Gamma",
+          "category": "Income",
+          "amount": 21000.00,
+          "taxable": true
+        },
+        {
+          "id": "t10",
+          "date": "2024-02-22",
+          "description": "Office Supplies",
+          "category": "Supplies",
+          "amount": -1200.00,
+          "taxable": true
+        },
+        {
+          "id": "t11",
+          "date": "2024-03-05",
+          "description": "Consulting Services Payment",
+          "category": "Income",
+          "amount": 28950.00,
+          "taxable": true
+        },
+        {
+          "id": "t12",
+          "date": "2024-03-10",
+          "description": "Office Rent",
+          "category": "Rent",
+          "amount": -8000.00,
+          "taxable": false
+        },
+        {
+          "id": "t13",
+          "date": "2024-03-15",
+          "description": "Software Subscriptions",
+          "category": "Software",
+          "amount": -1800.00,
+          "taxable": true
+        },
+        {
+          "id": "t14",
+          "date": "2024-03-20",
+          "description": "Equipment Purchase",
+          "category": "Equipment",
+          "amount": -12500.00,
+          "taxable": true
+        },
+        {
+          "id": "t15",
+          "date": "2024-03-25",
+          "description": "Professional Services",
+          "category": "Services",
+          "amount": -3200.00,
+          "taxable": true
+        }
+      ],
+      "categoryBreakdown": [
+        { "name": "Income", "value": 125450, "color": "#10b981", "percentage": 61.6 },
+        { "name": "Rent", "value": 24000, "color": "#ef4444", "percentage": 11.8 },
+        { "name": "Software", "value": 3600, "color": "#3b82f6", "percentage": 1.8 },
+        { "name": "Marketing", "value": 5200, "color": "#f59e0b", "percentage": 2.6 },
+        { "name": "Equipment", "value": 12500, "color": "#8b5cf6", "percentage": 6.1 },
+        { "name": "Services", "value": 3200, "color": "#ec4899", "percentage": 1.6 },
+        { "name": "Supplies", "value": 1200, "color": "#14b8a6", "percentage": 0.6 },
+        { "name": "Utilities", "value": 600, "color": "#f97316", "percentage": 0.3 }
+      ],
+      "monthlyData": [
+        { "month": "January", "income": 57000, "expenses": 10400, "net": 46600 },
+        { "month": "February", "income": 39500, "expenses": 14400, "net": 25100 },
+        { "month": "March", "income": 28950, "expenses": 25500, "net": 3450 }
+      ]
+    },
+    {
+      "reportId": "r2",
+      "type": "tax_summary",
+      "title": "February 2024 Tax Summary",
+      "dateRange": "2024-02-01 to 2024-02-29",
+      "generatedDate": "2024-03-01T10:00:00",
+      "summary": {
+        "totalIncome": 39500.00,
+        "taxableIncome": 39500.00,
+        "nonTaxableIncome": 0.00,
+        "deductibleExpenses": 6400.00,
+        "netTaxableIncome": 33100.00
+      },
+      "transactions": [
+        {
+          "id": "t6",
+          "date": "2024-02-03",
+          "description": "Freelance Invoice Payment",
+          "category": "Income",
+          "amount": 18500.00,
+          "taxable": true
+        },
+        {
+          "id": "t7",
+          "date": "2024-02-08",
+          "description": "Office Rent",
+          "category": "Rent",
+          "amount": -8000.00,
+          "taxable": false
+        },
+        {
+          "id": "t8",
+          "date": "2024-02-12",
+          "description": "Marketing Campaign",
+          "category": "Marketing",
+          "amount": -5200.00,
+          "taxable": true
+        },
+        {
+          "id": "t9",
+          "date": "2024-02-18",
+          "description": "Client Payment - Project Gamma",
+          "category": "Income",
+          "amount": 21000.00,
+          "taxable": true
+        },
+        {
+          "id": "t10",
+          "date": "2024-02-22",
+          "description": "Office Supplies",
+          "category": "Supplies",
+          "amount": -1200.00,
+          "taxable": true
+        }
+      ],
+      "taxBreakdown": [
+        { "name": "Taxable Income", "value": 39500, "color": "#10b981" },
+        { "name": "Deductible Expenses", "value": 6400, "color": "#3b82f6" },
+        { "name": "Non-Deductible Expenses", "value": 8000, "color": "#ef4444" }
+      ]
+    },
+    {
+      "reportId": "r3",
+      "type": "cashflow",
+      "title": "2024 Cash Flow Analysis",
+      "dateRange": "2024-01-01 to 2024-03-15",
+      "generatedDate": "2024-03-15T16:45:00",
+      "summary": {
+        "openingBalance": 50000.00,
+        "totalInflows": 125450.00,
+        "totalOutflows": 78230.50,
+        "closingBalance": 97219.50,
+        "netCashFlow": 47219.50
+      },
+      "transactions": [
+        {
+          "id": "t1",
+          "date": "2024-01-05",
+          "description": "Client Payment - Project Alpha",
+          "category": "Operating Inflow",
+          "amount": 25000.00,
+          "type": "inflow"
+        },
+        {
+          "id": "t2",
+          "date": "2024-01-10",
+          "description": "Office Rent",
+          "category": "Operating Outflow",
+          "amount": -8000.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t3",
+          "date": "2024-01-15",
+          "description": "Software Subscriptions",
+          "category": "Operating Outflow",
+          "amount": -1800.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t4",
+          "date": "2024-01-20",
+          "description": "Client Payment - Project Beta",
+          "category": "Operating Inflow",
+          "amount": 32000.00,
+          "type": "inflow"
+        },
+        {
+          "id": "t5",
+          "date": "2024-01-25",
+          "description": "Utilities",
+          "category": "Operating Outflow",
+          "amount": -600.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t6",
+          "date": "2024-02-03",
+          "description": "Freelance Invoice Payment",
+          "category": "Operating Inflow",
+          "amount": 18500.00,
+          "type": "inflow"
+        },
+        {
+          "id": "t7",
+          "date": "2024-02-08",
+          "description": "Office Rent",
+          "category": "Operating Outflow",
+          "amount": -8000.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t8",
+          "date": "2024-02-12",
+          "description": "Marketing Campaign",
+          "category": "Operating Outflow",
+          "amount": -5200.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t9",
+          "date": "2024-02-18",
+          "description": "Client Payment - Project Gamma",
+          "category": "Operating Inflow",
+          "amount": 21000.00,
+          "type": "inflow"
+        },
+        {
+          "id": "t10",
+          "date": "2024-02-22",
+          "description": "Office Supplies",
+          "category": "Operating Outflow",
+          "amount": -1200.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t11",
+          "date": "2024-03-05",
+          "description": "Consulting Services Payment",
+          "category": "Operating Inflow",
+          "amount": 28950.00,
+          "type": "inflow"
+        },
+        {
+          "id": "t12",
+          "date": "2024-03-10",
+          "description": "Office Rent",
+          "category": "Operating Outflow",
+          "amount": -8000.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t13",
+          "date": "2024-03-15",
+          "description": "Software Subscriptions",
+          "category": "Operating Outflow",
+          "amount": -1800.00,
+          "type": "outflow"
+        },
+        {
+          "id": "t14",
+          "date": "2024-03-20",
+          "description": "Equipment Purchase",
+          "category": "Investing Outflow",
+          "amount": -12500.00,
+          "type": "outflow"
+        }
+      ],
+      "cashflowByCategory": [
+        { "name": "Operating Inflows", "value": 125450, "color": "#10b981" },
+        { "name": "Operating Outflows", "value": 65730.50, "color": "#ef4444" },
+        { "name": "Investing Outflows", "value": 12500, "color": "#f59e0b" }
+      ],
+      "weeklyData": [
+        { "week": "Week 1", "inflow": 25000, "outflow": 8000, "net": 17000 },
+        { "week": "Week 2", "inflow": 0, "outflow": 1800, "net": -1800 },
+        { "week": "Week 3", "inflow": 32000, "outflow": 600, "net": 31400 },
+        { "week": "Week 4", "inflow": 0, "outflow": 0, "net": 0 },
+        { "week": "Week 5", "inflow": 18500, "outflow": 8000, "net": 10500 },
+        { "week": "Week 6", "inflow": 0, "outflow": 5200, "net": -5200 },
+        { "week": "Week 7", "inflow": 21000, "outflow": 1200, "net": 19800 },
+        { "week": "Week 8", "inflow": 0, "outflow": 0, "net": 0 },
+        { "week": "Week 9", "inflow": 28950, "outflow": 8000, "net": 20950 },
+        { "week": "Week 10", "inflow": 0, "outflow": 1800, "net": -1800 },
+        { "week": "Week 11", "inflow": 0, "outflow": 12500, "net": -12500 }
+      ]
+    }
+  ],
   "chartData": {
     "categoryBreakdown": [
       { "name": "Income", "value": 125450, "color": "#14e7ff" },

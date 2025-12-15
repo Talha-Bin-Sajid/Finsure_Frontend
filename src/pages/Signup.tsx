@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, User, Loader, ChevronDown } from "lucide-react";
+import { Mail, Lock, User, Loader, ChevronDown, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "../utils/toast";
+
 
 export const Signup: React.FC = () => {
   const [name, setName] = useState("");
@@ -11,6 +12,9 @@ export const Signup: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // password show kranay k lye
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // password show kranay k lye
+
   const { signup } = useAuth();
   const navigate = useNavigate();
 
@@ -152,19 +156,29 @@ export const Signup: React.FC = () => {
               </label>
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60"
                   size={20}
                 />
+
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-4 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-12 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="••••••••"
                 />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60 hover:text-[#14e7ff]"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
             </div>
+
 
             <div>
               <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
@@ -172,19 +186,31 @@ export const Signup: React.FC = () => {
               </label>
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60"
                   size={20}
                 />
+
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-4 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-12 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="••••••••"
                 />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60 hover:text-[#14e7ff]"
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
             </div>
+
 
             <button
               type="submit"

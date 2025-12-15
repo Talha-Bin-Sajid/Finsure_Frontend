@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Loader } from 'lucide-react';
+import { Mail, Lock, Loader, Eye, EyeOff } from 'lucide-react';
+
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from '../utils/toast';
 
@@ -8,6 +9,8 @@ export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -55,22 +58,37 @@ export const Login: React.FC = () => {
               </div>
             </div>
 
+
             <div>
               <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
                 Password
               </label>
+
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#e7f0fa]/60" size={20} />
+                <Lock
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60"
+                  size={20}
+                />
+
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-4 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-12 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="••••••••"
                 />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60 hover:text-[#14e7ff]"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
             </div>
+
 
             <button
               type="submit"
