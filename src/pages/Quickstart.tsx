@@ -52,10 +52,10 @@ export const Quickstart: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto py-12">
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#e7f0fa] mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
           Get Started in Minutes
         </h1>
-        <p className="text-xl text-[#e7f0fa]/80 mb-8">
+        <p className="text-xl text-[var(--text-primary)] opacity-80 mb-8">
           Follow these simple steps to transform your financial workflow
         </p>
         <button
@@ -71,7 +71,7 @@ export const Quickstart: React.FC = () => {
         {steps.map((step, index) => (
           <div
             key={index}
-            className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-8 hover:border-[#14e7ff] transition-all duration-300"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8 hover:border-[#14e7ff] transition-all duration-300"
           >
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-shrink-0">
@@ -86,13 +86,13 @@ export const Quickstart: React.FC = () => {
               </div>
 
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-[#e7f0fa] mb-3">{step.title}</h3>
-                <p className="text-lg text-[#e7f0fa]/80 mb-4">{step.description}</p>
+                <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">{step.title}</h3>
+                <p className="text-lg text-[var(--text-primary)] opacity-80 mb-4">{step.description}</p>
                 <ul className="space-y-2">
                   {step.details.map((detail, detailIndex) => (
                     <li key={detailIndex} className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 bg-[#14e7ff] rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-[#e7f0fa]/70">{detail}</span>
+                      <span className="text-[var(--text-primary)] opacity-70">{detail}</span>
                     </li>
                   ))}
                 </ul>
@@ -108,11 +108,11 @@ export const Quickstart: React.FC = () => {
         ))}
       </div>
 
-      <div className="mt-16 bg-gradient-to-br from-[#151c27] to-[#0c111a] border border-[#14e7ff]/20 rounded-2xl p-8 text-center">
-        <h2 className="text-3xl font-bold text-[#e7f0fa] mb-4">
+      <div className="mt-16 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] border border-[var(--border-color)] rounded-2xl p-8 text-center">
+        <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">
           Ready to Experience FINSURE?
         </h2>
-        <p className="text-lg text-[#e7f0fa]/80 mb-6">
+        <p className="text-lg text-[var(--text-primary)] opacity-80 mb-6">
           Join thousands of users who have streamlined their financial workflow
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -124,7 +124,7 @@ export const Quickstart: React.FC = () => {
           </button>
           <button
             onClick={() => navigate('/login')}
-            className="bg-[#151c27] hover:bg-[#14e7ff]/10 text-[#14e7ff] border border-[#14e7ff] px-8 py-3 rounded-lg font-medium transition-colors"
+            className="bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[#14e7ff] border border-[#14e7ff] px-8 py-3 rounded-lg font-medium transition-colors"
           >
             Sign In
           </button>

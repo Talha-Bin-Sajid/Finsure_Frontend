@@ -41,14 +41,14 @@ export const MobileNav: React.FC = () => {
   const links = isAuthenticated ? authenticatedLinks : publicLinks;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#151c27] border-t border-[#14e7ff]/20 md:hidden z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[var(--bg-secondary)] border-t border-[var(--border-color)] md:hidden z-50">
       <div className="flex items-center justify-around py-2">
         {links.map(link => (
           <NavLink
             key={link.to}
             to={link.to}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 px-4 py-2 text-[#e7f0fa] transition-colors ${
+              `flex flex-col items-center gap-1 px-4 py-2 text-[var(--text-primary)] transition-colors ${
                 isActive ? 'text-[#14e7ff]' : ''
               }`
             }

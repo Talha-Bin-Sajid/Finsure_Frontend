@@ -8,16 +8,16 @@ export const PublicLayout: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#0c111a]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
 
       <div className={`transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
-        <header className="bg-[#151c27] border-b border-[#14e7ff]/20 px-4 md:px-6 py-3 flex items-center justify-between">
+        <header className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] px-4 md:px-6 py-3 flex items-center justify-between">
           <h1 className="text-xl md:text-2xl font-bold text-[#14e7ff] md:hidden">FINSURE</h1>
           <div className="flex items-center gap-3 ml-auto">
             <button
               onClick={() => navigate('/login')}
-              className="text-[#e7f0fa] hover:text-[#14e7ff] px-4 py-2 transition-colors"
+              className="text-[var(--text-primary)] hover:text-[#14e7ff] px-4 py-2 transition-colors"
             >
               Login
             </button>

@@ -35,13 +35,13 @@ export const ToastContainer: React.FC = () => {
       {toasts.map(toast => (
         <div
           key={toast.id}
-          className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-4 shadow-lg flex items-start gap-3 animate-slide-in"
+          className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 shadow-lg flex items-start gap-3 animate-slide-in"
         >
           <ToastIcon type={toast.type} />
-          <p className="flex-1 text-sm text-[#e7f0fa]">{toast.message}</p>
+          <p className="flex-1 text-sm text-[var(--text-primary)]">{toast.message}</p>
           <button
             onClick={() => toastManager.dismiss(toast.id)}
-            className="text-[#e7f0fa]/60 hover:text-[#e7f0fa] transition-colors"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <X size={16} />
           </button>

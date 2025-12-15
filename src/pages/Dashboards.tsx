@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { mockApi } from '../services/apiClient';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface ChartData {
   categoryBreakdown: Array<{ name: string; value: number; color: string }>;
@@ -11,6 +12,7 @@ interface ChartData {
 export const Dashboards: React.FC = () => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,84 +36,51 @@ export const Dashboards: React.FC = () => {
 
   if (!chartData) return null;
 
+  // Get theme-aware colors
+  const bgColor = theme === 'dark' ? '#151c27' : '#f5f7fa';
+  const borderColor = theme === 'dark' ? 'rgba(20, 231, 255, 0.2)' : '#e2e8f0';
+  const textColor = theme === 'dark' ? '#e7f0fa' : '#1a202c';
+  const gridColor = theme === 'dark' ? '#14e7ff20' : '#e2e8f0';
+  const axisColor = theme === 'dark' ? '#e7f0fa60' : '#718096';
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[#e7f0fa] mb-2">Visual Dashboards</h1>
-        <p className="text-[#e7f0fa]/60">
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Visual Dashboards</h1>
+        <p className="text-[var(--text-secondary)]">
           Interactive charts and visualizations of your financial data
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6">
-          <h2 className="text-xl font-bold text-[#e7f0fa] mb-6">Category Breakdown</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={chartData.categoryBreakdown}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {chartData.categoryBreakdown.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#151c27',
-                  border: '1px solid rgba(20, 231, 255, 0.2)',
-                  borderRadius: '8px',
-                  color: '#e7f0fa'
-                }}
-                formatter={(value: number) => `$${value.toLocaleString()}`}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {chartData.categoryBreakdown.map((item, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                ></div>
-                <span className="text-sm text-[#e7f0fa]/80">{item.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div >
+        
 
-        <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6">
-          <h2 className="text-xl font-bold text-[#e7f0fa] mb-6">Monthly Income vs Expenses</h2>
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
+          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Monthly Income vs Expenses</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData.monthlyTrend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#14e7ff20" />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
               <XAxis
                 dataKey="month"
-                stroke="#e7f0fa60"
+                stroke={axisColor}
                 style={{ fontSize: '12px' }}
               />
               <YAxis
-                stroke="#e7f0fa60"
+                stroke={axisColor}
                 style={{ fontSize: '12px' }}
                 tickFormatter={(value) => `$${value / 1000}k`}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#151c27',
-                  border: '1px solid rgba(20, 231, 255, 0.2)',
+                  backgroundColor: bgColor,
+                  border: `1px solid ${borderColor}`,
                   borderRadius: '8px',
-                  color: '#e7f0fa'
+                  color: textColor
                 }}
                 formatter={(value: number) => `$${value.toLocaleString()}`}
               />
               <Legend
-                wrapperStyle={{ color: '#e7f0fa' }}
+                wrapperStyle={{ color: textColor }}
               />
               <Bar dataKey="income" fill="#14e7ff" radius={[8, 8, 0, 0]} />
               <Bar dataKey="expenses" fill="#0ab6ff" radius={[8, 8, 0, 0]} />
@@ -119,27 +88,27 @@ export const Dashboards: React.FC = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6 lg:col-span-2">
-          <h2 className="text-xl font-bold text-[#e7f0fa] mb-6">Cash Flow Trend</h2>
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6 lg:col-span-2">
+          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Cash Flow Trend</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData.cashflow}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#14e7ff20" />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
               <XAxis
                 dataKey="week"
-                stroke="#e7f0fa60"
+                stroke={axisColor}
                 style={{ fontSize: '12px' }}
               />
               <YAxis
-                stroke="#e7f0fa60"
+                stroke={axisColor}
                 style={{ fontSize: '12px' }}
                 tickFormatter={(value) => `$${value / 1000}k`}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#151c27',
-                  border: '1px solid rgba(20, 231, 255, 0.2)',
+                  backgroundColor: bgColor,
+                  border: `1px solid ${borderColor}`,
                   borderRadius: '8px',
-                  color: '#e7f0fa'
+                  color: textColor
                 }}
                 formatter={(value: number) => `$${value.toLocaleString()}`}
               />
@@ -156,13 +125,13 @@ export const Dashboards: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6">
-        <h2 className="text-xl font-bold text-[#e7f0fa] mb-4">Apache Superset Integration</h2>
-        <p className="text-[#e7f0fa]/60 mb-4">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">Apache Superset Integration</h2>
+        <p className="text-[var(--text-secondary)] mb-4">
           Connect to Apache Superset for advanced analytics and custom dashboards
         </p>
-        <div className="bg-[#0c111a] border border-[#14e7ff]/20 rounded-lg p-12 text-center">
-          <p className="text-[#e7f0fa]/40 mb-4">Superset integration placeholder</p>
+        <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg p-12 text-center">
+          <p className="text-[var(--text-secondary)] mb-4">Superset integration placeholder</p>
           <button className="bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-6 py-3 rounded-lg font-medium transition-colors">
             Configure Superset
           </button>

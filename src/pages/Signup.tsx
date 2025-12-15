@@ -4,7 +4,6 @@ import { Mail, Lock, User, Loader, ChevronDown, Eye, EyeOff } from "lucide-react
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "../utils/toast";
 
-
 export const Signup: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,8 +11,8 @@ export const Signup: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // password show kranay k lye
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // password show kranay k lye
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -45,28 +44,28 @@ export const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0c111a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-[#14e7ff] mb-2">FINSURE</h1>
-          <p className="text-[#e7f0fa]/60">
+          <p className="text-[var(--text-secondary)]">
             Financial Insights & Secure Reporting
           </p>
         </div>
 
-        <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-8 shadow-xl">
-          <h2 className="text-2xl font-bold text-[#e7f0fa] mb-6">
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8 shadow-xl">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6">
             Create Account
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Full Name
               </label>
               <div className="relative">
                 <User
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]"
                   size={20}
                 />
                 <input
@@ -74,19 +73,19 @@ export const Signup: React.FC = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-4 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-4 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="John Doe"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Email
               </label>
               <div className="relative">
                 <Mail
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]"
                   size={20}
                 />
                 <input
@@ -94,27 +93,26 @@ export const Signup: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-4 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-4 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="your.email@example.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 User Type
               </label>
 
               <div className="relative group">
                 <User
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
                   size={20}
                 />
 
-                {/* Arrow */}
                 <ChevronDown
                   size={20}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]
                  opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
                 />
 
@@ -122,9 +120,9 @@ export const Signup: React.FC = () => {
                   value={userType}
                   onChange={(e) => setUserType(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa]
+                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)]
                  pl-10 pr-10 py-3 rounded-lg
-                 border border-[#14e7ff]/20
+                 border border-[var(--border-color)]
                  focus:border-[#14e7ff] focus:outline-none
                  transition-colors
                  appearance-none cursor-pointer"
@@ -133,17 +131,11 @@ export const Signup: React.FC = () => {
                     Select user type
                   </option>
 
-                  <option
-                    value="businessman"
-                    className="bg-[#0c111a] hover:bg-[#0ab6ff] hover:text-[#0c111a]"
-                  >
+                  <option value="businessman">
                     Businessman
                   </option>
 
-                  <option
-                    value="freelancer"
-                    className="bg-[#0c111a] hover:bg-[#0ab6ff] hover:text-[#0c111a]"
-                  >
+                  <option value="freelancer">
                     Freelancer
                   </option>
                 </select>
@@ -151,12 +143,12 @@ export const Signup: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Password
               </label>
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
                   size={20}
                 />
 
@@ -165,28 +157,27 @@ export const Signup: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-12 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-12 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="••••••••"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60 hover:text-[#14e7ff]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[#14e7ff]"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
-
             <div>
-              <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Confirm Password
               </label>
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
                   size={20}
                 />
 
@@ -195,22 +186,19 @@ export const Signup: React.FC = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-12 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-12 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="••••••••"
                 />
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60 hover:text-[#14e7ff]"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[#14e7ff]"
                 >
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
-
 
             <button
               type="submit"
@@ -229,7 +217,7 @@ export const Signup: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-[#e7f0fa]/60 text-sm">
+            <p className="text-[var(--text-secondary)] text-sm">
               Already have an account?{" "}
               <Link
                 to="/login"

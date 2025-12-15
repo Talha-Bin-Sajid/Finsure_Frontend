@@ -97,15 +97,15 @@ export const ExtractionReview: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#e7f0fa]">Extraction Review</h1>
-          <p className="text-[#e7f0fa]/60">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Extraction Review</h1>
+          <p className="text-[var(--text-secondary)]">
             Review and edit extracted transaction data
           </p>
         </div>
         <div className="flex gap-3">
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-2 bg-[#151c27] hover:bg-[#14e7ff]/10 text-[#14e7ff] border border-[#14e7ff] px-4 py-2 rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[#14e7ff] border border-[#14e7ff] px-4 py-2 rounded-lg font-medium transition-colors"
           >
             <Download size={18} />
             <span>Export CSV</span>
@@ -119,57 +119,57 @@ export const ExtractionReview: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg overflow-hidden">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-[#0c111a] border-b border-[#14e7ff]/20">
+            <thead className="bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Description</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Amount</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Category</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Taxable</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#e7f0fa]">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Date</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Description</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Amount</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Category</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Taxable</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {transactions.map((transaction) => (
                 <tr
                   key={transaction.id}
-                  className="border-b border-[#14e7ff]/10 hover:bg-[#14e7ff]/5 transition-colors"
+                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] transition-colors"
                 >
-                  <td className="px-6 py-4 text-[#e7f0fa]">
+                  <td className="px-6 py-4 text-[var(--text-primary)]">
                     {editingId === transaction.id ? (
                       <input
                         type="date"
                         value={editForm.date}
                         onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                        className="bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                        className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
                       />
                     ) : (
                       transaction.date
                     )}
                   </td>
-                  <td className="px-6 py-4 text-[#e7f0fa]">
+                  <td className="px-6 py-4 text-[var(--text-primary)]">
                     {editingId === transaction.id ? (
                       <input
                         type="text"
                         value={editForm.description}
                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                        className="w-full bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                        className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
                       />
                     ) : (
                       transaction.description
                     )}
                   </td>
-                  <td className="px-6 py-4 text-[#e7f0fa]">
+                  <td className="px-6 py-4 text-[var(--text-primary)]">
                     {editingId === transaction.id ? (
                       <input
                         type="number"
                         step="0.01"
                         value={editForm.amount}
                         onChange={(e) => setEditForm({ ...editForm, amount: parseFloat(e.target.value) })}
-                        className="w-24 bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                        className="w-24 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
                       />
                     ) : (
                       <span className={transaction.amount < 0 ? 'text-red-400' : 'text-green-400'}>
@@ -177,12 +177,12 @@ export const ExtractionReview: React.FC = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-[#e7f0fa]">
+                  <td className="px-6 py-4 text-[var(--text-primary)]">
                     {editingId === transaction.id ? (
                       <select
                         value={editForm.category}
                         onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                        className="bg-[#0c111a] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
+                        className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
                       >
                         {categories.map(cat => (
                           <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>

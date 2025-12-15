@@ -49,12 +49,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full bg-[#151c27] border-r border-[#14e7ff]/20 transition-all duration-300 z-40 ${
+      className={`fixed left-0 top-0 h-full bg-[var(--bg-secondary)] border-r border-[var(--border-color)] transition-all duration-300 z-40 ${
         isCollapsed ? 'w-20' : 'w-64'
       } hidden md:block`}
     >
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-6 border-b border-[#14e7ff]/20">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
           {!isCollapsed && (
             <h1 className="text-2xl font-bold text-[#14e7ff]">FINSURE</h1>
           )}
@@ -63,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
           )}
           <button
             onClick={onToggle}
-            className="text-[#e7f0fa] hover:text-[#14e7ff] transition-colors"
+            className="text-[var(--text-primary)] hover:text-[#14e7ff] transition-colors"
             aria-label="Toggle sidebar"
           >
             {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -71,7 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
         </div>
 
         {isAuthenticated && user && (
-          <div className="p-4 border-b border-[#14e7ff]/20">
+          <div className="p-4 border-b border-[var(--border-color)]">
             <div className="flex items-center gap-3">
               <img
                 src={user.avatar}
@@ -80,8 +80,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
               />
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#e7f0fa] truncate">{user.name}</p>
-                  <p className="text-xs text-[#e7f0fa]/60 truncate">{user.email}</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)] truncate">{user.name}</p>
+                  <p className="text-xs text-[var(--text-secondary)] truncate">{user.email}</p>
                 </div>
               )}
             </div>
@@ -94,7 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-6 py-3 text-[#e7f0fa] hover:bg-[#14e7ff]/10 transition-colors ${
+                `flex items-center gap-3 px-6 py-3 text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors ${
                   isActive ? 'bg-[#14e7ff]/20 border-r-2 border-[#14e7ff]' : ''
                 } ${isCollapsed ? 'justify-center' : ''}`
               }

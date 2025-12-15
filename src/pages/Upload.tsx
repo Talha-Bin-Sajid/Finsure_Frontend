@@ -75,8 +75,8 @@ export const Upload: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[#e7f0fa] mb-2">Upload Documents</h1>
-        <p className="text-[#e7f0fa]/60">
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Upload Documents</h1>
+        <p className="text-[var(--text-secondary)]">
           Upload your receipts, invoices, or bank statements for automatic data extraction
         </p>
       </div>
@@ -84,14 +84,14 @@ export const Upload: React.FC = () => {
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="bg-[#151c27] border-2 border-dashed border-[#14e7ff]/40 rounded-lg p-12 text-center hover:border-[#14e7ff] transition-colors cursor-pointer"
+        className="bg-[var(--bg-secondary)] border-2 border-dashed border-[#14e7ff]/40 rounded-lg p-12 text-center hover:border-[#14e7ff] transition-colors cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
         <UploadIcon className="mx-auto text-[#14e7ff] mb-4" size={48} />
-        <h3 className="text-xl font-semibold text-[#e7f0fa] mb-2">
+        <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
           Drop files here or click to browse
         </h3>
-        <p className="text-[#e7f0fa]/60">
+        <p className="text-[var(--text-secondary)]">
           Supported formats: PDF, JPG, PNG, HEIC (Max 10MB per file)
         </p>
         <input
@@ -105,27 +105,27 @@ export const Upload: React.FC = () => {
       </div>
 
       {files.length > 0 && (
-        <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6">
-          <h3 className="text-xl font-bold text-[#e7f0fa] mb-4">
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
+          <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4">
             Selected Files ({files.length})
           </h3>
           <div className="space-y-3">
             {files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center gap-4 p-4 bg-[#0c111a] rounded-lg"
+                className="flex items-center gap-4 p-4 bg-[var(--bg-primary)] rounded-lg"
               >
                 <File className="text-[#14e7ff] flex-shrink-0" size={24} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[#e7f0fa] font-medium truncate">{file.name}</p>
-                  <p className="text-sm text-[#e7f0fa]/60">
+                  <p className="text-[var(--text-primary)] font-medium truncate">{file.name}</p>
+                  <p className="text-sm text-[var(--text-secondary)]">
                     {(file.size / 1024).toFixed(2)} KB
                   </p>
                 </div>
                 <select
                   value={fileTypes[file.name] || ''}
                   onChange={(e) => setFileTypes({ ...fileTypes, [file.name]: e.target.value })}
-                  className="bg-[#151c27] text-[#e7f0fa] border border-[#14e7ff]/20 rounded px-3 py-2 focus:border-[#14e7ff] focus:outline-none"
+                  className="bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-3 py-2 focus:border-[#14e7ff] focus:outline-none"
                   disabled={isUploading}
                 >
                   <option value="">Select type</option>
@@ -136,7 +136,7 @@ export const Upload: React.FC = () => {
                 {!isUploading && (
                   <button
                     onClick={() => removeFile(index)}
-                    className="text-[#e7f0fa]/60 hover:text-red-400 transition-colors"
+                    className="text-[var(--text-secondary)] hover:text-red-400 transition-colors"
                   >
                     <X size={20} />
                   </button>
@@ -148,18 +148,18 @@ export const Upload: React.FC = () => {
           {isUploading && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[#e7f0fa] text-sm">Uploading...</span>
+                <span className="text-[var(--text-primary)] text-sm">Uploading...</span>
                 <span className="text-[#14e7ff] text-sm font-medium">
                   {Math.round(uploadProgress)}%
                 </span>
               </div>
-              <div className="w-full bg-[#0c111a] rounded-full h-2">
+              <div className="w-full bg-[var(--bg-primary)] rounded-full h-2">
                 <div
                   className="bg-[#14e7ff] h-2 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 ></div>
               </div>
-              <div className="mt-4 flex items-center gap-2 text-[#e7f0fa]/80">
+              <div className="mt-4 flex items-center gap-2 text-[var(--text-primary)] opacity-80">
                 <Loader className="animate-spin" size={20} />
                 <span>Processing files with OCR...</span>
               </div>
@@ -180,7 +180,7 @@ export const Upload: React.FC = () => {
                   setFiles([]);
                   setFileTypes({});
                 }}
-                className="px-6 bg-[#151c27] hover:bg-[#14e7ff]/10 text-[#e7f0fa] border border-[#14e7ff]/20 py-3 rounded-lg font-medium transition-colors"
+                className="px-6 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-[var(--border-color)] py-3 rounded-lg font-medium transition-colors"
               >
                 Clear All
               </button>

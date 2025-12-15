@@ -106,8 +106,8 @@ export const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#e7f0fa]">Dashboard Overview</h1>
-          <p className="text-[#e7f0fa]/60">Welcome back! Here's your financial summary</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Dashboard Overview</h1>
+          <p className="text-[var(--text-secondary)]">Welcome back! Here's your financial summary</p>
         </div>
         <div className="flex gap-3">
           <button
@@ -119,7 +119,7 @@ export const Dashboard: React.FC = () => {
           </button>
           <button
             onClick={() => navigate('/reports')}
-            className="flex items-center gap-2 bg-[#151c27] hover:bg-[#14e7ff]/10 text-[#14e7ff] border border-[#14e7ff] px-4 py-2 rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[#14e7ff] border border-[#14e7ff] px-4 py-2 rounded-lg font-medium transition-colors"
           >
             <FileText size={18} />
             <span>View Reports</span>
@@ -131,26 +131,26 @@ export const Dashboard: React.FC = () => {
         {summaryCards.map((card, index) => (
           <div
             key={index}
-            className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6 hover:border-[#14e7ff] transition-all duration-300"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6 hover:border-[#14e7ff] transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-4">
               <div className={`w-12 h-12 ${card.bgColor} rounded-lg flex items-center justify-center`}>
                 <card.icon className={card.color} size={24} />
               </div>
             </div>
-            <h3 className="text-sm text-[#e7f0fa]/60 mb-1">{card.title}</h3>
-            <p className="text-2xl font-bold text-[#e7f0fa]">{card.value}</p>
+            <h3 className="text-sm text-[var(--text-secondary)] mb-1">{card.title}</h3>
+            <p className="text-2xl font-bold text-[var(--text-primary)]">{card.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6">
-          <h2 className="text-xl font-bold text-[#e7f0fa] mb-4">Recent Uploads</h2>
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
+          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">Recent Uploads</h2>
           {recentUploads.length === 0 ? (
             <div className="text-center py-12">
-              <Upload className="mx-auto text-[#e7f0fa]/30 mb-4" size={48} />
-              <p className="text-[#e7f0fa]/60 mb-4">No uploads yet</p>
+              <Upload className="mx-auto text-[var(--text-secondary)] mb-4" size={48} />
+              <p className="text-[var(--text-secondary)] mb-4">No uploads yet</p>
               <button
                 onClick={() => navigate('/upload')}
                 className="bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-4 py-2 rounded-lg font-medium transition-colors"
@@ -163,14 +163,14 @@ export const Dashboard: React.FC = () => {
               {recentUploads.map((upload) => (
                 <div
                   key={upload.id}
-                  className="flex items-center justify-between p-3 bg-[#0c111a] rounded-lg hover:bg-[#14e7ff]/5 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
                   onClick={() => navigate('/history')}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <FileText className="text-[#14e7ff] flex-shrink-0" size={20} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[#e7f0fa] font-medium truncate">{upload.fileName}</p>
-                      <p className="text-sm text-[#e7f0fa]/60">{formatDate(upload.uploadDate)}</p>
+                      <p className="text-[var(--text-primary)] font-medium truncate">{upload.fileName}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">{formatDate(upload.uploadDate)}</p>
                     </div>
                   </div>
                   <span
@@ -187,28 +187,6 @@ export const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-6">
-          <h2 className="text-xl font-bold text-[#e7f0fa] mb-4">Recent Activity</h2>
-          {activities.length === 0 ? (
-            <div className="text-center py-12">
-              <Activity className="mx-auto text-[#e7f0fa]/30 mb-4" size={48} />
-              <p className="text-[#e7f0fa]/60">No activity yet</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {activities.map((activity) => (
-                <div key={activity.id} className="flex gap-3">
-                  <div className="w-2 h-2 bg-[#14e7ff] rounded-full mt-2 flex-shrink-0"></div>
-                  <div className="flex-1">
-                    <p className="text-[#e7f0fa]">{activity.message}</p>
-                    <p className="text-sm text-[#e7f0fa]/60">{formatDate(activity.timestamp)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div> */}
       </div>
     </div>
   );

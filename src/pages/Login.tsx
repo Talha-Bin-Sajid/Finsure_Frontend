@@ -30,43 +30,42 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0c111a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-[#14e7ff] mb-2">FINSURE</h1>
-          <p className="text-[#e7f0fa]/60">Financial Insights & Secure Reporting</p>
+          <p className="text-[var(--text-secondary)]">Financial Insights & Secure Reporting</p>
         </div>
 
-        <div className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-8 shadow-xl">
-          <h2 className="text-2xl font-bold text-[#e7f0fa] mb-6">Welcome Back</h2>
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8 shadow-xl">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6">Welcome Back</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#e7f0fa]/60" size={20} />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]" size={20} />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-4 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-4 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="your.email@example.com"
                 />
               </div>
             </div>
 
-
             <div>
-              <label className="block text-sm font-medium text-[#e7f0fa] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Password
               </label>
 
               <div className="relative">
                 <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
                   size={20}
                 />
 
@@ -75,20 +74,19 @@ export const Login: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-[#0c111a] text-[#e7f0fa] pl-10 pr-12 py-3 rounded-lg border border-[#14e7ff]/20 focus:border-[#14e7ff] focus:outline-none transition-colors"
+                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-12 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
                   placeholder="••••••••"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#e7f0fa]/60 hover:text-[#14e7ff]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[#14e7ff]"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
-
 
             <button
               type="submit"
@@ -107,7 +105,7 @@ export const Login: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-[#e7f0fa]/60 text-sm">
+            <p className="text-[var(--text-secondary)] text-sm">
               Don't have an account?{' '}
               <Link to="/signup" className="text-[#14e7ff] hover:text-[#0ab6ff] transition-colors">
                 Sign up

@@ -15,7 +15,7 @@ export const FAQs: React.FC = () => {
     },
     {
       question: 'What file formats do you support?',
-      answer: 'FINSURE supports PDF, JPG, PNG, and HEIC formats for document uploads. Our OCR engine can extract data from scanned documents, photos, and digital PDFs with high accuracy.'
+      answer: 'FINSURE supports PDF, JPG, and PNG formats for document uploads. Our OCR engine can extract data from scanned documents, photos, and digital PDFs with high accuracy.'
     },
     {
       question: 'Can I export my data?',
@@ -23,23 +23,7 @@ export const FAQs: React.FC = () => {
     },
     {
       question: 'How accurate is the OCR extraction?',
-      answer: 'Our advanced OCR engine achieves 99% accuracy on Pro and Enterprise plans. Free plan users get standard OCR with approximately 95% accuracy. All extracted data can be manually reviewed and edited before processing.'
-    },
-    {
-      question: 'Do you offer a free trial?',
-      answer: 'Yes! All paid plans come with a 14-day free trial. No credit card is required to start your trial. The Free plan is available forever with basic features.'
-    },
-    {
-      question: 'Can I upgrade or downgrade my plan?',
-      answer: 'Absolutely! You can change your plan at any time from your account settings. Upgrades take effect immediately, while downgrades take effect at the end of your current billing cycle.'
-    },
-    {
-      question: 'What kind of support do you provide?',
-      answer: 'Free plan users receive email support with 48-hour response time. Pro users get priority support with 24-hour response time. Enterprise customers receive dedicated account management and phone support.'
-    },
-    {
-      question: 'Can I integrate FINSURE with my accounting software?',
-      answer: 'Yes! Pro and Enterprise plans include API access for custom integrations. We also offer pre-built integrations with popular accounting software like QuickBooks, Xero, and FreshBooks.'
+      answer: 'Our OCR engine delivers high accuracy ranging from 95% to 99%, with all extracted data fully reviewable and editable before processing. We continuously improve our models using machine learning techniques.'
     },
     {
       question: 'How do I delete my account?',
@@ -50,10 +34,10 @@ export const FAQs: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto py-12">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#e7f0fa] mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
           Frequently Asked Questions
         </h1>
-        <p className="text-xl text-[#e7f0fa]/80">
+        <p className="text-xl text-[var(--text-primary)] opacity-80">
           Everything you need to know about FINSURE
         </p>
       </div>
@@ -62,13 +46,13 @@ export const FAQs: React.FC = () => {
         {faqs.map((faq, index) => (
           <div
             key={index}
-            className="bg-[#151c27] border border-[#14e7ff]/20 rounded-lg overflow-hidden transition-all duration-300 hover:border-[#14e7ff]/50"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg overflow-hidden transition-all duration-300 hover:border-[#14e7ff]/50"
           >
             <button
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
               className="w-full flex items-center justify-between p-6 text-left"
             >
-              <h3 className="text-lg font-semibold text-[#e7f0fa]">{faq.question}</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)]">{faq.question}</h3>
               {openIndex === index ? (
                 <ChevronUp className="text-[#14e7ff] flex-shrink-0" size={24} />
               ) : (
@@ -77,16 +61,16 @@ export const FAQs: React.FC = () => {
             </button>
             {openIndex === index && (
               <div className="px-6 pb-6">
-                <p className="text-[#e7f0fa]/80 leading-relaxed">{faq.answer}</p>
+                <p className="text-[var(--text-primary)] opacity-80 leading-relaxed">{faq.answer}</p>
               </div>
             )}
           </div>
         ))}
       </div>
 
-      <div className="mt-12 text-center bg-[#151c27] border border-[#14e7ff]/20 rounded-lg p-8">
-        <h3 className="text-2xl font-bold text-[#e7f0fa] mb-4">Still have questions?</h3>
-        <p className="text-[#e7f0fa]/80 mb-6">
+      <div className="mt-12 text-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8">
+        <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-4">Still have questions?</h3>
+        <p className="text-[var(--text-primary)] opacity-80 mb-6">
           Our support team is here to help you get the most out of FINSURE
         </p>
         <a
