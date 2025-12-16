@@ -10,7 +10,7 @@ interface HistoryItem {
   status: string;
   fileType: string;
   transactionCount: number;
-  totalAmount: number;
+  // totalAmount: number;
 }
 
 export const History: React.FC = () => {
@@ -59,9 +59,9 @@ export const History: React.FC = () => {
     });
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(amount));
-  };
+  // const formatCurrency = (amount: number) => {
+  //   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(amount));
+  // };
 
   if (isLoading) {
     return (
@@ -155,9 +155,9 @@ export const History: React.FC = () => {
                           {formatDate(item.uploadDate)}
                         </span>
                         <span>{item.transactionCount} transactions</span>
-                        <span className={item.totalAmount >= 0 ? 'text-green-400' : 'text-red-400'}>
+                        {/* <span className={item.totalAmount >= 0 ? 'text-green-400' : 'text-red-400'}>
                           {formatCurrency(item.totalAmount)}
-                        </span>
+                        </span> */}
                       </div>
                     </div>
                   </div>

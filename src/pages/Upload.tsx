@@ -1,27 +1,43 @@
-import React, { useState, useRef } from 'react';
-import { Upload as UploadIcon, File, X, CheckCircle, Loader } from 'lucide-react';
-import { mockApi } from '../services/apiClient';
-import { toast } from '../utils/toast';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef } from "react";
+import {
+  Upload as UploadIcon,
+  File,
+  X,
+  CheckCircle,
+  Loader,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { mockApi } from "../services/apiClient";
+import { toast } from "../utils/toast";
+import { useNavigate } from "react-router-dom";
 
 export const Upload: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [fileTypes, setFileTypes] = useState<{ [key: string]: string }>({});
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [filePasswords, setFilePasswords] = useState<{ [key: string]: string }>(
+    {}
+  );
+  const [showPassword, setShowPassword] = useState<{ [key: string]: boolean }>(
+    {}
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const droppedFiles = Array.from(e.dataTransfer.files).filter(file =>
-      ['application/pdf', 'image/jpeg', 'image/png', 'image/heic'].includes(file.type)
+    const droppedFiles = Array.from(e.dataTransfer.files).filter((file) =>
+      ["application/pdf", "image/jpeg", "image/png", "image/heic"].includes(
+        file.type
+      )
     );
     if (droppedFiles.length > 0) {
       setFiles([...files, ...droppedFiles]);
       toast.success(`${droppedFiles.length} file(s) added`);
     } else {
-      toast.error('Please upload PDF, JPG, PNG, or HEIC files only');
+      toast.error("Please upload PDF, JPG, PNG, or HEIC files only");
     }
   };
 
@@ -34,22 +50,43 @@ export const Upload: React.FC = () => {
   };
 
   const removeFile = (index: number) => {
-    const newFiles = files.filter((_, i) => i !== index);
-    setFiles(newFiles);
+    const fileName = files[index].name;
+
+    setFiles(files.filter((_, i) => i !== index));
+
     const newFileTypes = { ...fileTypes };
-    delete newFileTypes[files[index].name];
+    delete newFileTypes[fileName];
     setFileTypes(newFileTypes);
+
+    const newPasswords = { ...filePasswords };
+    delete newPasswords[fileName];
+    setFilePasswords(newPasswords);
   };
 
   const handleUpload = async () => {
     if (files.length === 0) {
-      toast.error('Please select files to upload');
+      toast.error("Please select files to upload");
       return;
     }
 
-    const missingTypes = files.filter(file => !fileTypes[file.name]);
+    const missingTypes = files.filter((file) => !fileTypes[file.name]);
     if (missingTypes.length > 0) {
-      toast.error('Please select a type for all files');
+      toast.error("Please select a type for all files");
+      return;
+    }
+
+    const missingPasswords = files.filter(
+      (file) =>
+        fileTypes[file.name] === "bank_statement" && !filePasswords[file.name]
+    );
+
+    if (missingPasswords.length > 0) {
+      toast.error("Password is required for all bank statements");
+      return;
+    }
+
+    if (missingTypes.length > 0) {
+      toast.error("Please select a type for all files");
       return;
     }
 
@@ -58,16 +95,22 @@ export const Upload: React.FC = () => {
 
     try {
       for (let i = 0; i < files.length; i++) {
-        await mockApi.upload.uploadFile(files[i], fileTypes[files[i].name]);
+        await mockApi.upload.uploadFile(
+          files[i],
+          fileTypes[files[i].name],
+          fileTypes[files[i].name] === "bank_statement"
+            ? filePasswords[files[i].name]
+            : null
+        );
         setUploadProgress(((i + 1) / files.length) * 100);
       }
 
-      toast.success('All files uploaded successfully!');
+      toast.success("All files uploaded successfully!");
       setTimeout(() => {
-        navigate('/history');
+        navigate("/history");
       }, 1500);
     } catch (error) {
-      toast.error('Failed to upload files');
+      toast.error("Failed to upload files");
       setIsUploading(false);
     }
   };
@@ -75,9 +118,12 @@ export const Upload: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Upload Documents</h1>
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
+          Upload Documents
+        </h1>
         <p className="text-[var(--text-secondary)]">
-          Upload your receipts, invoices, or bank statements for automatic data extraction
+          Upload your receipts, invoices, or bank statements for automatic data
+          extraction
         </p>
       </div>
 
@@ -117,22 +163,61 @@ export const Upload: React.FC = () => {
               >
                 <File className="text-[#14e7ff] flex-shrink-0" size={24} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[var(--text-primary)] font-medium truncate">{file.name}</p>
+                  <p className="text-[var(--text-primary)] font-medium truncate">
+                    {file.name}
+                  </p>
                   <p className="text-sm text-[var(--text-secondary)]">
                     {(file.size / 1024).toFixed(2)} KB
                   </p>
                 </div>
                 <select
-                  value={fileTypes[file.name] || ''}
-                  onChange={(e) => setFileTypes({ ...fileTypes, [file.name]: e.target.value })}
+                  value={fileTypes[file.name] || ""}
+                  onChange={(e) =>
+                    setFileTypes({ ...fileTypes, [file.name]: e.target.value })
+                  }
                   className="bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-3 py-2 focus:border-[#14e7ff] focus:outline-none"
                   disabled={isUploading}
                 >
                   <option value="">Select type</option>
-                  <option value="receipt">Receipt</option>
-                  <option value="invoice">Invoice</option>
                   <option value="bank_statement">Bank Statement</option>
+                  <option value="mobile_wallet_statement">
+                    Mobile Wallet Statement
+                  </option>
                 </select>
+                {fileTypes[file.name] === "bank_statement" && (
+                  <div className="relative w-56">
+                    <input
+                      type={showPassword[file.name] ? "text" : "password"}
+                      placeholder="Statement password"
+                      value={filePasswords[file.name] || ""}
+                      onChange={(e) =>
+                        setFilePasswords({
+                          ...filePasswords,
+                          [file.name]: e.target.value,
+                        })
+                      }
+                      disabled={isUploading}
+                      className="w-full bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-3 py-2 pr-10 focus:border-[#14e7ff] focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowPassword({
+                          ...showPassword,
+                          [file.name]: !showPassword[file.name],
+                        })
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[#14e7ff]"
+                    >
+                      {showPassword[file.name] ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </button>
+                  </div>
+                )}
+
                 {!isUploading && (
                   <button
                     onClick={() => removeFile(index)}
@@ -148,7 +233,9 @@ export const Upload: React.FC = () => {
           {isUploading && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[var(--text-primary)] text-sm">Uploading...</span>
+                <span className="text-[var(--text-primary)] text-sm">
+                  Uploading...
+                </span>
                 <span className="text-[#14e7ff] text-sm font-medium">
                   {Math.round(uploadProgress)}%
                 </span>

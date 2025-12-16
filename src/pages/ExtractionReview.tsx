@@ -6,7 +6,6 @@ import { toast } from '../utils/toast';
 interface Transaction {
   id: string;
   date: string;
-  description: string;
   amount: number;
   category: string;
   taxable: boolean;
@@ -32,13 +31,7 @@ export const ExtractionReview: React.FC = () => {
 
   const categories = [
     'income',
-    'rent',
-    'software',
-    'office_supplies',
-    'utilities',
-    'travel',
-    'meals',
-    'other'
+    'expense',
   ];
 
   const startEdit = (transaction: Transaction) => {
@@ -70,7 +63,6 @@ export const ExtractionReview: React.FC = () => {
     const headers = ['Date', 'Description', 'Amount', 'Category', 'Taxable'];
     const rows = transactions.map(t => [
       t.date,
-      t.description,
       t.amount,
       t.category,
       t.taxable

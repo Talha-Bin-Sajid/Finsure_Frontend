@@ -46,7 +46,6 @@
         {
           "id": "t1",
           "date": "2024-03-01",
-          "description": "Client Payment - Project Alpha",
           "amount": 5500.00,
           "category": "income",
           "taxable": true
@@ -54,17 +53,15 @@
         {
           "id": "t2",
           "date": "2024-03-05",
-          "description": "Office Rent",
           "amount": -2200.00,
-          "category": "rent",
+          "category": "expense",
           "taxable": false
         },
         {
           "id": "t3",
           "date": "2024-03-08",
-          "description": "Software Subscriptions",
           "amount": -450.00,
-          "category": "software",
+          "category": "expense",
           "taxable": true
         }
       ]
