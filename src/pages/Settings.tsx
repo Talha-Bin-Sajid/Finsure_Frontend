@@ -1,76 +1,123 @@
-import React, { useState } from 'react';
-import { User, Lock, Bell, Download, Trash2 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { toast } from '../utils/toast';
+import React, { useState } from "react";
+import { User, Lock, Bell, Download, Trash2 } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "../utils/toast";
+import { authApi } from "../services/apiClient";
 
 export const Settings: React.FC = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('profile');
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const { user, updateUser } = useAuth();
+  const [activeTab, setActiveTab] = useState("profile");
+
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  // PROFILE UPDATE
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Profile updated successfully');
+    try {
+      const res = await authApi.updateProfile({ name, email });
+
+      toast.success(res.message || "Profile updated successfully");
+
+      // update auth context + localStorage
+      const updatedUser = {
+        ...user!,
+        name: res.user.name,
+        email: res.user.email,
+      };
+
+      updateUser(updatedUser);
+      
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Failed to update profile");
+    }
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  //CHANGE PASSWORD
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
-    toast.success('Password changed successfully');
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+
+    try {
+      const res = await authApi.changePassword({
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+
+      toast.success(res.message || "Password updated successfully");
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Failed to change password");
+    }
   };
 
   const handleNotificationsUpdate = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Notification preferences updated');
+    toast.success("Notification preferences updated");
   };
 
   const handleDataExport = () => {
-    toast.info('Preparing your data export. You will receive an email when ready.');
+    toast.info(
+      "Preparing your data export. You will receive an email when ready."
+    );
   };
 
   const handleAccountDelete = () => {
-    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      toast.error('Account deletion initiated. You will receive a confirmation email.');
+    if (
+      confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      toast.error(
+        "Account deletion initiated. You will receive a confirmation email."
+      );
     }
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'security', label: 'Security', icon: Lock },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'data', label: 'Data & Privacy', icon: Download }
+    { id: "profile", label: "Profile", icon: User },
+    { id: "security", label: "Security", icon: Lock },
+    { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "data", label: "Data & Privacy", icon: Download },
   ];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Settings</h1>
-        <p className="text-[var(--text-secondary)]">Manage your account settings and preferences</p>
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
+          Settings
+        </h1>
+        <p className="text-[var(--text-secondary)]">
+          Manage your account settings and preferences
+        </p>
       </div>
 
       <div className="flex gap-6 flex-col lg:flex-row">
         <div className="lg:w-64 flex-shrink-0">
           <nav className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-2">
-            {tabs.map(tab => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-[#14e7ff]/20 text-[#14e7ff]'
-                    : 'text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'
+                    ? "bg-[#14e7ff]/20 text-[#14e7ff]"
+                    : "text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]"
                 }`}
               >
                 <tab.icon size={20} />
@@ -81,9 +128,11 @@ export const Settings: React.FC = () => {
         </div>
 
         <div className="flex-1">
-          {activeTab === 'profile' && (
+          {activeTab === "profile" && (
             <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Profile Information</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">
+                Profile Information
+              </h2>
               <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
@@ -117,9 +166,11 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'security' && (
+          {activeTab === "security" && (
             <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Change Password</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">
+                Change Password
+              </h2>
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
@@ -164,14 +215,20 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'notifications' && (
+          {activeTab === "notifications" && (
             <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Notification Preferences</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">
+                Notification Preferences
+              </h2>
               <form onSubmit={handleNotificationsUpdate} className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-[var(--bg-primary)] rounded-lg">
                   <div>
-                    <h3 className="text-[var(--text-primary)] font-medium">Email Notifications</h3>
-                    <p className="text-sm text-[var(--text-secondary)]">Receive updates via email</p>
+                    <h3 className="text-[var(--text-primary)] font-medium">
+                      Email Notifications
+                    </h3>
+                    <p className="text-sm text-[var(--text-secondary)]">
+                      Receive updates via email
+                    </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -185,8 +242,12 @@ export const Settings: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between p-4 bg-[var(--bg-primary)] rounded-lg">
                   <div>
-                    <h3 className="text-[var(--text-primary)] font-medium">Push Notifications</h3>
-                    <p className="text-sm text-[var(--text-secondary)]">Receive browser notifications</p>
+                    <h3 className="text-[var(--text-primary)] font-medium">
+                      Push Notifications
+                    </h3>
+                    <p className="text-sm text-[var(--text-secondary)]">
+                      Receive browser notifications
+                    </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -208,12 +269,15 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'data' && (
+          {activeTab === "data" && (
             <div className="space-y-6">
               <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
-                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">Export Your Data</h2>
+                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">
+                  Export Your Data
+                </h2>
                 <p className="text-[var(--text-secondary)] mb-4">
-                  Download a copy of all your data including transactions, reports, and documents.
+                  Download a copy of all your data including transactions,
+                  reports, and documents.
                 </p>
                 <button
                   onClick={handleDataExport}
@@ -225,9 +289,12 @@ export const Settings: React.FC = () => {
               </div>
 
               <div className="bg-[var(--bg-secondary)] border border-red-500/20 rounded-lg p-6">
-                <h2 className="text-xl font-bold text-red-400 mb-4">Delete Account</h2>
+                <h2 className="text-xl font-bold text-red-400 mb-4">
+                  Delete Account
+                </h2>
                 <p className="text-[var(--text-secondary)] mb-4">
-                  Permanently delete your account and all associated data. This action cannot be undone.
+                  Permanently delete your account and all associated data. This
+                  action cannot be undone.
                 </p>
                 <button
                   onClick={handleAccountDelete}

@@ -4,8 +4,8 @@ import React, {
   useEffect,
   useState,
   ReactNode,
-} from 'react';
-import { authApi } from '../services/apiClient';
+} from "react";
+import { authApi } from "../services/apiClient";
 
 interface User {
   userID: string;
@@ -27,6 +27,7 @@ interface AuthContextType {
     userType: string
   ) => Promise<void>;
   logout: () => void;
+  updateUser: (user: User) => void;
   isLoading: boolean;
 }
 
@@ -44,8 +45,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   // Load user on refresh
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const savedUser = localStorage.getItem('user');
+    const token = localStorage.getItem("authToken");
+    const savedUser = localStorage.getItem("user");
 
     if (token && savedUser) {
       setUser(JSON.parse(savedUser));
@@ -61,8 +62,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       avatar: generateAvatar(res.user.name),
     };
 
-    localStorage.setItem('authToken', res.access_token);
-    localStorage.setItem('user', JSON.stringify(userWithAvatar));
+    localStorage.setItem("authToken", res.access_token);
+    localStorage.setItem("user", JSON.stringify(userWithAvatar));
     setUser(userWithAvatar);
   };
 
@@ -84,15 +85,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       avatar: generateAvatar(res.user.name),
     };
 
-    localStorage.setItem('authToken', res.access_token);
-    localStorage.setItem('user', JSON.stringify(userWithAvatar));
+    localStorage.setItem("authToken", res.access_token);
+    localStorage.setItem("user", JSON.stringify(userWithAvatar));
     setUser(userWithAvatar);
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
     setUser(null);
+  };
+
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
   return (
@@ -103,6 +109,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         login,
         signup,
         logout,
+        updateUser, 
         isLoading,
       }}
     >
@@ -114,7 +121,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };

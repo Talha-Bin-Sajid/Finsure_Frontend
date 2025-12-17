@@ -417,6 +417,24 @@ export const authApi = {
     const res = await apiClient.post("/api/v1/auth/login", data);
     return res.data;
   },
+
+  // ✅ UPDATE PROFILE (name & email)
+  updateProfile: async (data: { name: string; email: string }) => {
+    const res = await apiClient.patch("/api/v1/auth/edit/me", data);
+    return res.data;
+  },
+
+  // ✅ CHANGE PASSWORD
+  changePassword: async (data: {
+    current_password: string;
+    new_password: string;
+  }) => {
+    const res = await apiClient.patch(
+      "/api/v1/auth/change-password",
+      data
+    );
+    return res.data;
+  },
 };
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
