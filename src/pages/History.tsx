@@ -1,31 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Filter, ChevronDown, FileText, Calendar } from 'lucide-react';
-import { mockApi } from '../services/apiClient';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Filter, ChevronDown, FileText, Calendar } from "lucide-react";
+import { historyApi } from "../services/apiClient";
+import { useNavigate } from "react-router-dom";
 
 interface HistoryItem {
-  id: string;
   fileName: string;
   uploadDate: string;
   status: string;
   fileType: string;
   transactionCount: number;
-  // totalAmount: number;
 }
+
 
 export const History: React.FC = () => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [filteredHistory, setFilteredHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedType, setSelectedType] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await mockApi.history.getAll();
+        const data = await historyApi.getMyUploadHistory();
         setHistory(data);
         setFilteredHistory(data);
       } finally {
@@ -38,24 +37,24 @@ export const History: React.FC = () => {
   useEffect(() => {
     let filtered = [...history];
 
-    if (selectedType !== 'all') {
-      filtered = filtered.filter(item => item.fileType === selectedType);
+    if (selectedType !== "all") {
+      filtered = filtered.filter((item) => item.fileType === selectedType);
     }
 
-    if (selectedStatus !== 'all') {
-      filtered = filtered.filter(item => item.status === selectedStatus);
+    if (selectedStatus !== "all") {
+      filtered = filtered.filter((item) => item.status === selectedStatus);
     }
 
     setFilteredHistory(filtered);
   }, [selectedType, selectedStatus, history]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -75,7 +74,9 @@ export const History: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Upload History</h1>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+            Upload History
+          </h1>
           <p className="text-[var(--text-secondary)]">
             View and manage all your uploaded documents
           </p>
@@ -86,7 +87,12 @@ export const History: React.FC = () => {
         >
           <Filter size={18} />
           <span>Filters</span>
-          <ChevronDown size={18} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            size={18}
+            className={`transition-transform ${
+              showFilters ? "rotate-180" : ""
+            }`}
+          />
         </button>
       </div>
 
@@ -130,15 +136,20 @@ export const History: React.FC = () => {
         <div className="space-y-4">
           {filteredHistory.length === 0 ? (
             <div className="text-center py-12">
-              <FileText className="mx-auto text-[var(--text-secondary)] mb-4" size={48} />
-              <p className="text-[var(--text-secondary)]">No files found matching your filters</p>
+              <FileText
+                className="mx-auto text-[var(--text-secondary)] mb-4"
+                size={48}
+              />
+              <p className="text-[var(--text-secondary)]">
+                No files found matching your filters
+              </p>
             </div>
           ) : (
             filteredHistory.map((item) => (
               <div
-                key={item.id}
+                key={`${item.fileName}-${item.uploadDate}`}
                 className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg p-6 hover:border-[#14e7ff] transition-all duration-300 cursor-pointer"
-                onClick={() => navigate('/extracted')}
+                onClick={() => navigate("/extracted")}
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
@@ -163,13 +174,13 @@ export const History: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="px-3 py-1 bg-[#14e7ff]/10 text-[#14e7ff] rounded-full text-sm font-medium">
-                      {item.fileType.replace('_', ' ')}
+                      {item.fileType.replace("_", " ")}
                     </span>
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        item.status === 'completed'
-                          ? 'bg-green-400/10 text-green-400'
-                          : 'bg-yellow-400/10 text-yellow-400'
+                        item.status === "completed"
+                          ? "bg-green-400/10 text-green-400"
+                          : "bg-yellow-400/10 text-yellow-400"
                       }`}
                     >
                       {item.status}

@@ -8,7 +8,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { mockApi } from "../services/apiClient";
+import { uploadApi } from "../services/apiClient";
 import { toast } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 
@@ -85,32 +85,30 @@ export const Upload: React.FC = () => {
       return;
     }
 
-    if (missingTypes.length > 0) {
-      toast.error("Please select a type for all files");
-      return;
-    }
-
     setIsUploading(true);
     setUploadProgress(0);
 
     try {
       for (let i = 0; i < files.length; i++) {
-        await mockApi.upload.uploadFile(
+        await uploadApi.uploadStatement(
           files[i],
           fileTypes[files[i].name],
           fileTypes[files[i].name] === "bank_statement"
             ? filePasswords[files[i].name]
             : null
         );
+
         setUploadProgress(((i + 1) / files.length) * 100);
       }
 
-      toast.success("All files uploaded successfully!");
+      toast.success("Files uploaded successfully");
+
       setTimeout(() => {
         navigate("/history");
       }, 1500);
-    } catch (error) {
-      toast.error("Failed to upload files");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to upload files");
+    } finally {
       setIsUploading(false);
     }
   };

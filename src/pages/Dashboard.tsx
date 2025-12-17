@@ -10,7 +10,13 @@ import {
   Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { mockApi } from "../services/apiClient";
+import {
+  mockApi,
+  accountsApi,
+  historyApi,
+  dashboardApi,
+} from "../services/apiClient";
+import { toast } from "../utils/toast";
 
 interface SummaryData {
   totalIncome: number;
@@ -20,7 +26,6 @@ interface SummaryData {
 }
 
 interface RecentUpload {
-  id: string;
   fileName: string;
   uploadDate: string;
   status: string;
@@ -48,14 +53,17 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [summaryData, uploadsData, activitiesData] = await Promise.all([
-          mockApi.dashboard.getSummary(),
-          mockApi.dashboard.getRecentUploads(),
+        const [summaryData, activitiesData, history] = await Promise.all([
+          dashboardApi.getOverview(),
           mockApi.dashboard.getActivities(),
+          historyApi.getMyUploadHistory(),
         ]);
+
         setSummary(summaryData);
-        setRecentUploads(uploadsData);
         setActivities(activitiesData);
+
+        // 👇 show latest 5 uploads
+        setRecentUploads(history.slice(0, 5));
       } finally {
         setIsLoading(false);
       }
@@ -74,7 +82,7 @@ export const Dashboard: React.FC = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: "PKR",
     }).format(amount);
   };
 
@@ -89,20 +97,24 @@ export const Dashboard: React.FC = () => {
 
   const handleAddAccount = async () => {
     if (!bankName || !accountNumber) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     setIsSubmittingAccount(true);
     try {
-      await mockApi.accounts.addAccount({
-        bankName,
-        accountNumber,
+      await accountsApi.addAccount({
+        bank: bankName,
+        acc_no: accountNumber,
       });
+
+      toast.success("Bank account added successfully");
 
       setShowAddAccountModal(false);
       setBankName("");
       setAccountNumber("");
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Failed to add account");
     } finally {
       setIsSubmittingAccount(false);
     }
@@ -221,8 +233,8 @@ export const Dashboard: React.FC = () => {
                 className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded px-3 py-2 text-[var(--text-primary)] focus:border-[#14e7ff] outline-none"
               >
                 <option value="">Select Bank</option>
-                <option value="Meezan Bank">Meezan Bank</option>
-                <option value="EasyPaisa">EasyPaisa</option>
+                <option value="Meezan">Meezan Bank</option>
+                <option value="Easypaisa">EasyPaisa</option>
               </select>
 
               <input
@@ -275,7 +287,7 @@ export const Dashboard: React.FC = () => {
             <div className="space-y-3">
               {recentUploads.map((upload) => (
                 <div
-                  key={upload.id}
+                  key={`${upload.fileName}-${upload.uploadDate}`}
                   className="flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
                   onClick={() => navigate("/history")}
                 >

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Save, Download, Edit2, Check, X } from 'lucide-react';
-import { mockApi } from '../services/apiClient';
-import { toast } from '../utils/toast';
+import React, { useState, useEffect } from "react";
+import { Save, Download, Edit2, Check, X } from "lucide-react";
+import { extractionApi } from "../services/apiClient";
+import { toast } from "../utils/toast";
 
 interface Transaction {
   id: string;
@@ -20,19 +20,19 @@ export const ExtractionReview: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const extraction = await mockApi.extractions.getByFileId('1');
-        setTransactions(extraction.transactions);
+        const data = await extractionApi.getMyTransactions();
+        setTransactions(data);
+      } catch (err) {
+        toast.error("Failed to load transactions");
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  const categories = [
-    'income',
-    'expense',
-  ];
+  const categories = ["income", "expense"];
 
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id);
@@ -45,36 +45,40 @@ export const ExtractionReview: React.FC = () => {
   };
 
   const saveEdit = async () => {
-    if (!editingId) return;
-
-    try {
-      await mockApi.extractions.updateTransaction('1', editingId, editForm);
-      setTransactions(transactions.map(t =>
-        t.id === editingId ? { ...t, ...editForm } : t
-      ));
-      toast.success('Transaction updated successfully');
-      cancelEdit();
-    } catch (error) {
-      toast.error('Failed to update transaction');
-    }
+    toast.info("Editing will be enabled soon");
+    cancelEdit();
   };
 
   const exportToCSV = () => {
-    const headers = ['Date', 'Description', 'Amount', 'Category', 'Taxable'];
-    const rows = transactions.map(t => [
+    const headers = ["Date", "Amount", "Type", "Taxable"];
+
+    const rows = transactions.map((t) => [
       t.date,
-      t.amount,
-      t.category,
-      t.taxable
+
+      // ✅ Signed amount based on category
+      t.category === "income"
+        ? `+${t.amount.toFixed(2)}`
+        : `-${t.amount.toFixed(2)}`,
+
+      // ✅ Human-readable type
+      t.category === "income" ? "Income" : "Expense",
+
+      // ✅ Human-readable taxable
+      t.taxable ? "Yes" : "No",
     ]);
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+
+    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'transactions.csv';
+    a.download = "transactions.csv";
     a.click();
-    toast.success('Exported to CSV');
+
+    URL.revokeObjectURL(url);
+    toast.success("Exported to CSV");
   };
 
   if (isLoading) {
@@ -89,7 +93,9 @@ export const ExtractionReview: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Extraction Review</h1>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+            Extraction Review
+          </h1>
           <p className="text-[var(--text-secondary)]">
             Review and edit extracted transaction data
           </p>
@@ -102,9 +108,7 @@ export const ExtractionReview: React.FC = () => {
             <Download size={18} />
             <span>Export CSV</span>
           </button>
-          <button
-            className="flex items-center gap-2 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-4 py-2 rounded-lg font-medium transition-colors"
-          >
+          <button className="flex items-center gap-2 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-4 py-2 rounded-lg font-medium transition-colors">
             <Save size={18} />
             <span>Save Changes</span>
           </button>
@@ -116,11 +120,21 @@ export const ExtractionReview: React.FC = () => {
           <table className="w-full">
             <thead className="bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Amount</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Category</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Taxable</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                  Date
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                  Amount
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                  Category
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                  Taxable
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -134,7 +148,9 @@ export const ExtractionReview: React.FC = () => {
                       <input
                         type="date"
                         value={editForm.date}
-                        onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, date: e.target.value })
+                        }
                         className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
                       />
                     ) : (
@@ -159,12 +175,23 @@ export const ExtractionReview: React.FC = () => {
                         type="number"
                         step="0.01"
                         value={editForm.amount}
-                        onChange={(e) => setEditForm({ ...editForm, amount: parseFloat(e.target.value) })}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            amount: parseFloat(e.target.value),
+                          })
+                        }
                         className="w-24 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
                       />
                     ) : (
-                      <span className={transaction.amount < 0 ? 'text-red-400' : 'text-green-400'}>
-                        ${Math.abs(transaction.amount).toFixed(2)}
+                      <span
+                        className={
+                          transaction.category === "income"
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }
+                      >
+                        PKR {transaction.amount.toFixed(2)}
                       </span>
                     )}
                   </td>
@@ -172,16 +199,20 @@ export const ExtractionReview: React.FC = () => {
                     {editingId === transaction.id ? (
                       <select
                         value={editForm.category}
-                        onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, category: e.target.value })
+                        }
                         className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
                       >
-                        {categories.map(cat => (
-                          <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat.replace("_", " ")}
+                          </option>
                         ))}
                       </select>
                     ) : (
                       <span className="px-2 py-1 bg-[#14e7ff]/10 text-[#14e7ff] rounded text-sm">
-                        {transaction.category.replace('_', ' ')}
+                        {transaction.category.replace("_", " ")}
                       </span>
                     )}
                   </td>
@@ -190,16 +221,23 @@ export const ExtractionReview: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={editForm.taxable}
-                        onChange={(e) => setEditForm({ ...editForm, taxable: e.target.checked })}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            taxable: e.target.checked,
+                          })
+                        }
                         className="w-4 h-4 accent-[#14e7ff]"
                       />
                     ) : (
-                      <span className={`px-2 py-1 rounded text-sm ${
-                        transaction.taxable
-                          ? 'bg-green-400/10 text-green-400'
-                          : 'bg-gray-400/10 text-gray-400'
-                      }`}>
-                        {transaction.taxable ? 'Yes' : 'No'}
+                      <span
+                        className={`px-2 py-1 rounded text-sm ${
+                          transaction.taxable
+                            ? "bg-green-400/10 text-green-400"
+                            : "bg-gray-400/10 text-gray-400"
+                        }`}
+                      >
+                        {transaction.taxable ? "Yes" : "No"}
                       </span>
                     )}
                   </td>
