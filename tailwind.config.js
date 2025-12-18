@@ -7,8 +7,8 @@ export default {
       colors: {
         // Define theme colors that work for both light and dark modes
         primary: {
-          DEFAULT: '#0ab6ff',
-          hover: '#14e7ff',
+          DEFAULT: '#14e7ffff',
+          hover: '#00e5ffd2',
         },
         dark: {
           bg: {
