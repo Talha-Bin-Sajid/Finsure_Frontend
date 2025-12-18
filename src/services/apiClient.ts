@@ -47,10 +47,7 @@ export const authApi = {
     current_password: string;
     new_password: string;
   }) => {
-    const res = await apiClient.patch(
-      "/api/v1/auth/change-password",
-      data
-    );
+    const res = await apiClient.patch("/api/v1/auth/change-password", data);
     return res.data;
   },
 };
@@ -83,14 +80,8 @@ export const uploadApi = {
 
 // ================= ACCOUNTS API =================
 export const accountsApi = {
-  addAccount: async (data: {
-    bank: string;
-    acc_no: string;
-  }) => {
-    const res = await apiClient.post(
-      "/api/v1/files/new_account",
-      data
-    );
+  addAccount: async (data: { bank: string; acc_no: string }) => {
+    const res = await apiClient.post("/api/v1/files/new_account", data);
     return res.data;
   },
 };
@@ -98,9 +89,7 @@ export const accountsApi = {
 // ================= HISTORY API =================
 export const historyApi = {
   getMyUploadHistory: async () => {
-    const res = await apiClient.get(
-      "/api/v1/data/my-upload-history"
-    );
+    const res = await apiClient.get("/api/v1/data/my-upload-history");
     return res.data.history;
   },
 };
@@ -108,18 +97,14 @@ export const historyApi = {
 // ================= DASHBOARD API =================
 export const dashboardApi = {
   getOverview: async () => {
-    const res = await apiClient.get(
-      "/api/v1/data/my-dashboard-overview"
-    );
-    return res.data.dashboardSummary; 
+    const res = await apiClient.get("/api/v1/data/my-dashboard-overview");
+    return res.data.dashboardSummary;
   },
 };
 
 export const extractionApi = {
   getMyTransactions: async () => {
-    const res = await apiClient.get(
-      "/api/v1/data/my-transaction-history"
-    );
+    const res = await apiClient.get("/api/v1/data/my-transaction-history");
 
     return res.data.transactions.map((t: any, index: number) => ({
       id: String(index + 1),
@@ -134,6 +119,81 @@ export const extractionApi = {
   },
 };
 
+// ================= REPORTS API =================
+
+export const reportsApi = {
+  // Get all reports
+  getAll: async () => {
+    const res = await apiClient.get("/api/v1/reports");
+    return res.data.reports;
+  },
+
+  // Generate report
+  generate: async (reportType: string, startDate: string, endDate: string) => {
+    // REAL API ONLY for income_expense
+    if (reportType === "income_expense") {
+      const res = await apiClient.post("/api/v1/reports/generate", {
+        reportType,
+        startDate,
+        endDate,
+      });
+
+      return res.data;
+    }
+
+    // MOCK for others
+    await delay(800);
+    const template = (mockData as any).reportTemplates[reportType];
+    if (!template) throw new Error("Template not found");
+
+    const newReportId = `r${Date.now()}`;
+
+    const report = {
+      id: newReportId,
+      title:
+        reportType === "tax_summary"
+          ? "Tax Summary Report"
+          : "Cash Flow Analysis",
+      generatedDate: new Date().toISOString(),
+      type: reportType,
+      dateRange: `${startDate} to ${endDate}`,
+    };
+
+    const detailedReport = {
+      ...template,
+      reportId: newReportId,
+      title: report.title,
+      dateRange: report.dateRange,
+      generatedDate: report.generatedDate,
+    };
+
+    generatedReports.unshift(report);
+    generatedDetailedReports.push(detailedReport);
+    detailedReportsMap.set(newReportId, detailedReport);
+
+    return { report };
+  },
+
+  //Get detailed report
+  getDetailedReport: async (reportId: string) => {
+    // Try backend first
+    try {
+      const res = await apiClient.get(`/api/v1/reports/${reportId}`);
+      return res.data;
+    } catch {
+      // fallback to mock
+      const detailed = detailedReportsMap.get(reportId);
+      if (!detailed) throw new Error("Report not found");
+      return detailed;
+    }
+  },
+
+  // Download PDF (future backend)
+  downloadReportPDF: async (reportId: string) => {
+    await delay(500);
+    return { success: true };
+  },
+};
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -269,7 +329,7 @@ export const mockApi = {
         uploadDate: new Date().toISOString(),
         status: "processing",
         fileType,
-        password, // 👈 sent to BE (null for non-BS)
+        password,
       };
       return { success: true, upload: newUpload };
     },

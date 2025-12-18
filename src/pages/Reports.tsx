@@ -432,10 +432,7 @@
 //   );
 // };
 
-
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   FileText,
   Download,
@@ -447,11 +444,11 @@ import {
   TrendingDown,
   DollarSign,
   Calendar,
-  BarChart3
-} from 'lucide-react';
-import { mockApi } from '../services/apiClient';
-import { toast } from '../utils/toast';
-import { useTheme } from '../contexts/ThemeContext';
+  BarChart3,
+} from "lucide-react";
+import { reportsApi } from "../services/apiClient";
+import { toast } from "../utils/toast";
+import { useTheme } from "../contexts/ThemeContext";
 
 /* ===================== TYPES ===================== */
 
@@ -491,20 +488,22 @@ export const Reports: React.FC = () => {
   const { theme } = useTheme();
 
   // Theme-aware colors (same pattern as Dashboards)
-  const bgPrimary = 'var(--bg-primary)';
-  const bgSecondary = 'var(--bg-secondary)';
-  const borderColor = 'var(--border-color)';
-  const textPrimary = 'var(--text-primary)';
-  const textSecondary = 'var(--text-secondary)';
+  const bgPrimary = "var(--bg-primary)";
+  const bgSecondary = "var(--bg-secondary)";
+  const borderColor = "var(--border-color)";
+  const textPrimary = "var(--text-primary)";
+  const textSecondary = "var(--text-secondary)";
 
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
-  const [reportType, setReportType] = useState('income_expense');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [selectedReport, setSelectedReport] = useState<DetailedReport | null>(null);
+  const [reportType, setReportType] = useState("income_expense");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [selectedReport, setSelectedReport] = useState<DetailedReport | null>(
+    null
+  );
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -513,7 +512,7 @@ export const Reports: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await mockApi.reports.getAll();
+        const data = await reportsApi.getAll();
         setReports(data);
       } finally {
         setIsLoading(false);
@@ -523,46 +522,48 @@ export const Reports: React.FC = () => {
   }, []);
 
   const reportTypeNames: Record<string, string> = {
-    income_expense: 'Income vs Expense',
-    tax_summary: 'Tax Summary',
-    cashflow: 'Cash Flow Analysis'
+    income_expense: "Income vs Expense",
+    tax_summary: "Tax Summary",
+    cashflow: "Cash Flow Analysis",
   };
 
   /* ===================== HELPERS ===================== */
 
   const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
+    new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
 
   const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      maximumFractionDigits: 0
+    new Intl.NumberFormat("en-PK", {
+      style: "currency",
+      currency: "PKR",
+      maximumFractionDigits: 0,
     }).format(Math.abs(amount));
+
+  const isIncome = (txn: Transaction) =>
+    txn.type === "income" || txn.flowType === "credit";
 
   /* ===================== ACTIONS ===================== */
 
   const generateReport = async () => {
     if (!startDate || !endDate) {
-      toast.error('Please select date range');
+      toast.error("Please select date range");
       return;
     }
 
     setIsGenerating(true);
     try {
-      const dateRange = `${startDate} to ${endDate}`;
-      const res = await mockApi.reports.generate(reportType, dateRange);
+      const res = await reportsApi.generate(reportType, startDate, endDate);
       setReports([res.report, ...reports]);
-      toast.success('Report generated successfully!');
+      toast.success("Report generated successfully!");
       setShowGenerateModal(false);
-      setStartDate('');
-      setEndDate('');
+      setStartDate("");
+      setEndDate("");
     } catch {
-      toast.error('Failed to generate report');
+      toast.error("Failed to generate report");
     } finally {
       setIsGenerating(false);
     }
@@ -571,10 +572,10 @@ export const Reports: React.FC = () => {
   const viewReportDetails = async (report: Report) => {
     setIsLoadingDetails(true);
     try {
-      const detailed = await mockApi.reports.getDetailedReport(report.id);
+      const detailed = await reportsApi.getDetailedReport(report.id);
       setSelectedReport(detailed);
     } catch {
-      toast.error('Failed to load report details');
+      toast.error("Failed to load report details");
     } finally {
       setIsLoadingDetails(false);
     }
@@ -584,11 +585,11 @@ export const Reports: React.FC = () => {
     if (!selectedReport) return;
     setIsDownloading(true);
     try {
-      await mockApi.reports.downloadReportPDF(selectedReport.reportId);
+      await reportsApi.downloadReportPDF(selectedReport.reportId);
       window.print();
-      toast.success('Report ready for download!');
+      toast.success("Report ready for download!");
     } catch {
-      toast.error('Failed to download report');
+      toast.error("Failed to download report");
     } finally {
       setIsDownloading(false);
     }
@@ -596,7 +597,7 @@ export const Reports: React.FC = () => {
 
   const shareReport = (report: Report) => {
     navigator.clipboard.writeText(`https://finsure.app/reports/${report.id}`);
-    toast.success('Share link copied to clipboard');
+    toast.success("Share link copied to clipboard");
   };
 
   /* ===================== LOADING ===================== */
@@ -651,34 +652,64 @@ export const Reports: React.FC = () => {
           }
         `}</style>
 
-        <div className="flex items-center justify-between no-print">
-          <button onClick={() => setSelectedReport(null)} className="flex items-center gap-2 text-[#14e7ff] hover:text-[#0ab6ff] transition-colors">
+        <div className="flex items-center justify-between no-print mb-6">
+          <button
+            onClick={() => setSelectedReport(null)}
+            className="flex items-center gap-2 text-[#14e7ff] hover:text-[#0ab6ff] transition-colors"
+          >
             <ArrowLeft size={20} />
             <span>Back to Reports</span>
           </button>
-          <button onClick={downloadReportPDF} disabled={isDownloading} className="flex items-center gap-2 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50">
-            {isDownloading ? <><Loader className="animate-spin" size={18} /><span>Preparing...</span></> : <><Download size={18} /><span>Download PDF</span></>}
+
+          <button
+            onClick={downloadReportPDF}
+            disabled={isDownloading}
+            className="flex items-center gap-2 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+          >
+            {isDownloading ? (
+              <>
+                <Loader className="animate-spin" size={18} />
+                <span>Preparing...</span>
+              </>
+            ) : (
+              <>
+                <Download size={18} />
+                <span>Download PDF</span>
+              </>
+            )}
           </button>
         </div>
 
-        <div id="pdf-content" className="bg-white text-black p-8 rounded-lg" style={{ maxWidth: '210mm', margin: '0 auto' }}>
+        <div
+          id="pdf-content"
+          className="bg-white text-black p-8 rounded-lg"
+          style={{ maxWidth: "210mm", margin: "0 auto" }}
+        >
           {/* Header with FINSURE Branding */}
           <div className="print-header bg-gradient-to-r from-[#0ab6ff] to-[#14e7ff] text-white p-6 rounded-lg mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold tracking-wide mb-1">FINSURE</h1>
-                <p className="text-sm opacity-90">Financial Management System</p>
+                <h1 className="text-4xl font-bold tracking-wide mb-1">
+                  FINSURE
+                </h1>
+                <p className="text-sm opacity-90">
+                  Financial Management System
+                </p>
               </div>
               <div className="text-right">
                 <div className="text-xs opacity-90">Report ID</div>
-                <div className="font-mono text-sm">{selectedReport.reportId}</div>
+                <div className="font-mono text-sm">
+                  {selectedReport.reportId}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Report Title */}
           <div className="mb-6 pb-4 border-b-2 print-border">
-            <h2 className="text-2xl font-bold print-text mb-2">{selectedReport.title}</h2>
+            <h2 className="text-2xl font-bold print-text mb-2">
+              {selectedReport.title}
+            </h2>
             <div className="flex flex-wrap gap-4 text-sm print-text-secondary">
               <div className="flex items-center gap-2">
                 <Calendar size={14} />
@@ -686,28 +717,55 @@ export const Reports: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <FileText size={14} />
-                <span>Generated: {formatDate(selectedReport.generatedDate)}</span>
+                <span>
+                  Generated: {formatDate(selectedReport.generatedDate)}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Income vs Expense Report */}
-          {selectedReport.type === 'income_expense' && (
+          {selectedReport.type === "income_expense" && (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {[
-                  { label: 'Total Income', value: selectedReport.summary.totalIncome, icon: TrendingUp, className: 'print-positive' },
-                  { label: 'Total Expenses', value: selectedReport.summary.totalExpenses, icon: TrendingDown, className: 'print-negative' },
-                  { label: 'Net Balance', value: selectedReport.summary.netBalance, icon: DollarSign, className: 'print-primary' },
-                  { label: 'Profit Margin', value: `${selectedReport.summary.profitMargin}%`, icon: BarChart3, className: 'print-primary', isPercentage: true }
+                  {
+                    label: "Total Income",
+                    value: selectedReport.summary.totalIncome,
+                    icon: TrendingUp,
+                    className: "print-positive",
+                  },
+                  {
+                    label: "Total Expenses",
+                    value: selectedReport.summary.totalExpenses,
+                    icon: TrendingDown,
+                    className: "print-negative",
+                  },
+                  {
+                    label: "Net Balance",
+                    value: selectedReport.summary.netBalance,
+                    icon: DollarSign,
+                    className: "print-primary",
+                  },
+                  {
+                    label: "Profit Margin",
+                    value: `${selectedReport.summary.profitMargin}%`,
+                    icon: BarChart3,
+                    className: "print-primary",
+                    isPercentage: true,
+                  },
                 ].map((item, i) => (
                   <div key={i} className="print-card border rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <item.icon className={item.className} size={16} />
-                      <span className="text-xs print-text-secondary">{item.label}</span>
+                      <span className="text-xs print-text-secondary">
+                        {item.label}
+                      </span>
                     </div>
                     <p className={`text-xl font-bold ${item.className}`}>
-                      {item.isPercentage ? item.value : formatCurrency(item.value as number)}
+                      {item.isPercentage
+                        ? item.value
+                        : formatCurrency(item.value as number)}
                     </p>
                   </div>
                 ))}
@@ -715,22 +773,39 @@ export const Reports: React.FC = () => {
 
               {selectedReport.monthlyData && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold print-text mb-3">Monthly Summary</h3>
+                  <h3 className="text-lg font-semibold print-text mb-3">
+                    Monthly Summary
+                  </h3>
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b-2 print-border">
-                        {['Month', 'Income', 'Expenses', 'Net'].map(h => (
-                          <th key={h} className={`${h === 'Month' ? 'text-left' : 'text-right'} print-text-secondary text-sm py-2 px-2`}>{h}</th>
+                        {["Month", "Income", "Expenses", "Net"].map((h) => (
+                          <th
+                            key={h}
+                            className={`${
+                              h === "Month" ? "text-left" : "text-right"
+                            } print-text-secondary text-sm py-2 px-2`}
+                          >
+                            {h}
+                          </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {selectedReport.monthlyData.map((m, i) => (
                         <tr key={i} className="border-b print-border">
-                          <td className="py-2 px-2 print-text text-sm">{m.month}</td>
-                          <td className="py-2 px-2 text-right print-positive text-sm font-semibold">{formatCurrency(m.income)}</td>
-                          <td className="py-2 px-2 text-right print-negative text-sm font-semibold">{formatCurrency(m.expenses)}</td>
-                          <td className="py-2 px-2 text-right print-primary text-sm font-bold">{formatCurrency(m.net)}</td>
+                          <td className="py-2 px-2 print-text text-sm">
+                            {m.month}
+                          </td>
+                          <td className="py-2 px-2 text-right print-positive text-sm font-semibold">
+                            {formatCurrency(m.income)}
+                          </td>
+                          <td className="py-2 px-2 text-right print-negative text-sm font-semibold">
+                            {formatCurrency(m.expenses)}
+                          </td>
+                          <td className="py-2 px-2 text-right print-primary text-sm font-bold">
+                            {formatCurrency(m.net)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -741,32 +816,60 @@ export const Reports: React.FC = () => {
           )}
 
           {/* Tax Summary Report */}
-          {selectedReport.type === 'tax_summary' && (
+          {selectedReport.type === "tax_summary" && (
             <>
               <div className="grid grid-cols-3 gap-4 mb-6">
                 {[
-                  { label: 'Taxable Income', value: selectedReport.summary.taxableIncome, icon: DollarSign, className: 'print-positive' },
-                  { label: 'Deductible Expenses', value: selectedReport.summary.deductibleExpenses, icon: TrendingDown, className: 'print-primary' },
-                  { label: 'Net Taxable Income', value: selectedReport.summary.netTaxableIncome, icon: BarChart3, className: 'print-primary' }
+                  {
+                    label: "Taxable Income",
+                    value: selectedReport.summary.taxableIncome,
+                    icon: DollarSign,
+                    className: "print-positive",
+                  },
+                  {
+                    label: "Deductible Expenses",
+                    value: selectedReport.summary.deductibleExpenses,
+                    icon: TrendingDown,
+                    className: "print-primary",
+                  },
+                  {
+                    label: "Net Taxable Income",
+                    value: selectedReport.summary.netTaxableIncome,
+                    icon: BarChart3,
+                    className: "print-primary",
+                  },
                 ].map((item, i) => (
                   <div key={i} className="print-card border rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <item.icon className={item.className} size={16} />
-                      <span className="text-xs print-text-secondary">{item.label}</span>
+                      <span className="text-xs print-text-secondary">
+                        {item.label}
+                      </span>
                     </div>
-                    <p className={`text-xl font-bold ${item.className}`}>{formatCurrency(item.value)}</p>
+                    <p className={`text-xl font-bold ${item.className}`}>
+                      {formatCurrency(item.value)}
+                    </p>
                   </div>
                 ))}
               </div>
 
               {selectedReport.taxBreakdown && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold print-text mb-3">Tax Breakdown</h3>
+                  <h3 className="text-lg font-semibold print-text mb-3">
+                    Tax Breakdown
+                  </h3>
                   <div className="grid grid-cols-3 gap-3">
                     {selectedReport.taxBreakdown.map((item, idx) => (
-                      <div key={idx} className="print-card border rounded-lg p-3">
-                        <span className="text-xs print-text-secondary block mb-1">{item.name}</span>
-                        <p className="text-lg font-semibold print-text">{formatCurrency(item.value)}</p>
+                      <div
+                        key={idx}
+                        className="print-card border rounded-lg p-3"
+                      >
+                        <span className="text-xs print-text-secondary block mb-1">
+                          {item.name}
+                        </span>
+                        <p className="text-lg font-semibold print-text">
+                          {formatCurrency(item.value)}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -776,43 +879,84 @@ export const Reports: React.FC = () => {
           )}
 
           {/* Cash Flow Report */}
-          {selectedReport.type === 'cashflow' && (
+          {selectedReport.type === "cashflow" && (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {[
-                  { label: 'Opening Balance', value: selectedReport.summary.openingBalance, icon: DollarSign, className: 'print-text' },
-                  { label: 'Total Inflows', value: selectedReport.summary.totalInflows, icon: TrendingUp, className: 'print-positive' },
-                  { label: 'Total Outflows', value: selectedReport.summary.totalOutflows, icon: TrendingDown, className: 'print-negative' },
-                  { label: 'Closing Balance', value: selectedReport.summary.closingBalance, icon: DollarSign, className: 'print-primary' }
+                  {
+                    label: "Opening Balance",
+                    value: selectedReport.summary.openingBalance,
+                    icon: DollarSign,
+                    className: "print-text",
+                  },
+                  {
+                    label: "Total Inflows",
+                    value: selectedReport.summary.totalInflows,
+                    icon: TrendingUp,
+                    className: "print-positive",
+                  },
+                  {
+                    label: "Total Outflows",
+                    value: selectedReport.summary.totalOutflows,
+                    icon: TrendingDown,
+                    className: "print-negative",
+                  },
+                  {
+                    label: "Closing Balance",
+                    value: selectedReport.summary.closingBalance,
+                    icon: DollarSign,
+                    className: "print-primary",
+                  },
                 ].map((item, i) => (
                   <div key={i} className="print-card border rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <item.icon className={item.className} size={16} />
-                      <span className="text-xs print-text-secondary">{item.label}</span>
+                      <span className="text-xs print-text-secondary">
+                        {item.label}
+                      </span>
                     </div>
-                    <p className={`text-xl font-bold ${item.className}`}>{formatCurrency(item.value)}</p>
+                    <p className={`text-xl font-bold ${item.className}`}>
+                      {formatCurrency(item.value)}
+                    </p>
                   </div>
                 ))}
               </div>
 
               {selectedReport.weeklyData && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold print-text mb-3">Weekly Cash Flow</h3>
+                  <h3 className="text-lg font-semibold print-text mb-3">
+                    Weekly Cash Flow
+                  </h3>
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b-2 print-border">
-                        {['Week', 'Inflow', 'Outflow', 'Net'].map(h => (
-                          <th key={h} className={`${h === 'Week' ? 'text-left' : 'text-right'} print-text-secondary text-sm py-2 px-2`}>{h}</th>
+                        {["Week", "Inflow", "Outflow", "Net"].map((h) => (
+                          <th
+                            key={h}
+                            className={`${
+                              h === "Week" ? "text-left" : "text-right"
+                            } print-text-secondary text-sm py-2 px-2`}
+                          >
+                            {h}
+                          </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {selectedReport.weeklyData.slice(0, 10).map((w, i) => (
                         <tr key={i} className="border-b print-border">
-                          <td className="py-2 px-2 print-text text-sm">{w.week}</td>
-                          <td className="py-2 px-2 text-right print-positive text-sm font-semibold">{formatCurrency(w.inflow)}</td>
-                          <td className="py-2 px-2 text-right print-negative text-sm font-semibold">{formatCurrency(w.outflow)}</td>
-                          <td className="py-2 px-2 text-right print-primary text-sm font-bold">{formatCurrency(w.net)}</td>
+                          <td className="py-2 px-2 print-text text-sm">
+                            {w.week}
+                          </td>
+                          <td className="py-2 px-2 text-right print-positive text-sm font-semibold">
+                            {formatCurrency(w.inflow)}
+                          </td>
+                          <td className="py-2 px-2 text-right print-negative text-sm font-semibold">
+                            {formatCurrency(w.outflow)}
+                          </td>
+                          <td className="py-2 px-2 text-right print-primary text-sm font-bold">
+                            {formatCurrency(w.net)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -824,36 +968,65 @@ export const Reports: React.FC = () => {
 
           {/* Transactions Table */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold print-text mb-3">Detailed Transactions</h3>
+            <h3 className="text-lg font-semibold print-text mb-3">
+              Detailed Transactions
+            </h3>
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b-2 print-border">
-                  <th className="text-left print-text-secondary text-sm py-2 px-2">Date</th>
-                  <th className="text-right print-text-secondary text-sm py-2 px-2">Amount</th>
-                  <th className="text-right print-text-secondary text-sm py-2 px-2">Type</th>
+                  <th className="text-left print-text-secondary text-sm py-2 px-2">
+                    Date
+                  </th>
+                  <th className="text-right print-text-secondary text-sm py-2 px-2">
+                    Amount
+                  </th>
+                  <th className="text-right print-text-secondary text-sm py-2 px-2">
+                    Type
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {selectedReport.transactions.map((txn) => (
-                  <tr key={txn.id} className="border-b print-border">
-                    <td className="py-2 px-2 print-text text-sm">{formatDate(txn.date)}</td>
-                    <td className={`py-2 px-2 text-right font-semibold text-sm ${txn.amount >= 0 ? 'print-positive' : 'print-negative'}`}>
-                      {txn.amount >= 0 ? '+' : ''}{formatCurrency(txn.amount)}
-                    </td>
-                    <td className="py-2 px-2 text-right text-sm print-text-secondary capitalize">
-                      {txn.type || txn.flowType || (txn.amount >= 0 ? 'Income' : 'Expense')}
-                    </td>
-                  </tr>
-                ))}
+                {selectedReport.transactions.map((txn) => {
+                  const income = isIncome(txn);
+
+                  return (
+                    <tr key={txn.id} className="border-b print-border">
+                      <td className="py-2 px-2 print-text text-sm">
+                        {formatDate(txn.date)}
+                      </td>
+
+                      <td
+                        className={`py-2 px-2 text-right font-semibold text-sm ${
+                          income ? "print-positive" : "print-negative"
+                        }`}
+                      >
+                        {income ? "+" : "-"}
+                        {formatCurrency(txn.amount)}
+                      </td>
+
+                      <td className="py-2 px-2 text-right text-sm print-text-secondary capitalize">
+                        {income ? "Income" : "Expense"}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
           {/* Footer */}
           <div className="mt-8 pt-4 border-t-2 print-border text-center">
-            <p className="text-xs print-text-secondary mb-1">Generated by <span className="font-bold text-[#0ab6ff]">FINSURE</span> Financial Management System</p>
-            <p className="text-xs print-text-secondary">This report is confidential and intended for authorized use only.</p>
-            <p className="text-xs print-text-secondary mt-2">www.finsure.app | support@finsure.com</p>
+            <p className="text-xs print-text-secondary mb-1">
+              Generated by{" "}
+              <span className="font-bold text-[#0ab6ff]">FINSURE</span>{" "}
+              Financial Management System
+            </p>
+            <p className="text-xs print-text-secondary">
+              This report is confidential and intended for authorized use only.
+            </p>
+            <p className="text-xs print-text-secondary mt-2">
+              www.finsure.app | support@finsure.com
+            </p>
           </div>
         </div>
       </div>
@@ -971,7 +1144,7 @@ export const Reports: React.FC = () => {
                 disabled={isGenerating}
                 className="flex-1 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] py-3 rounded-lg font-medium"
               >
-                {isGenerating ? 'Generating…' : 'Generate'}
+                {isGenerating ? "Generating…" : "Generate"}
               </button>
 
               <button
