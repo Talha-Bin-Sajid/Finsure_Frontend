@@ -33,9 +33,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Avatar generator (frontend only)
-const generateAvatar = (name: string) =>
-  `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
+// Avatar generator (frontend only).
+// Uses DiceBear's `initials` style: a colored circle with the user's initials.
+// Gender-neutral, language-neutral, and matches FINSURE's cyan accent.
+const generateAvatar = (name: string) => {
+  const seed = encodeURIComponent(name || "FINSURE");
+  return (
+    `https://api.dicebear.com/7.x/initials/svg?seed=${seed}` +
+    `&backgroundColor=0ab6ff,14e7ff,0c8fb8` +
+    `&textColor=0c111a` +
+    `&fontWeight=600`
+  );
+};
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,

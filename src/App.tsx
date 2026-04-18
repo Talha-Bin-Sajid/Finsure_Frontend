@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastContainer } from './components/Toast';
+import { ChatbotProvider } from './components/chatbot/ChatbotContext';
 
 import { PublicLayout } from './layouts/PublicLayout';
 import { MainLayout } from './layouts/MainLayout';
@@ -94,10 +95,12 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-          <ToastContainer />
-        </BrowserRouter>
+        <ChatbotProvider>
+          <BrowserRouter>
+            <AppRoutes />
+            <ToastContainer />
+          </BrowserRouter>
+        </ChatbotProvider>
       </AuthProvider>
     </ThemeProvider>
   );

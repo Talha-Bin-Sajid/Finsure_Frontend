@@ -244,7 +244,7 @@ export const mockApi = {
         id: String(mockData.users.length + 1),
         email,
         name,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
+        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0ab6ff,14e7ff,0c8fb8&textColor=0c111a&fontWeight=600`,
         twoFactorEnabled: false,
       };
       const token = `mock-token-${newUser.id}`;
