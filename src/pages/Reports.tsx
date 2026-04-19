@@ -688,13 +688,23 @@ export const Reports: React.FC = () => {
           {/* Header with FINSURE Branding */}
           <div className="print-header bg-gradient-to-r from-[#0ab6ff] to-[#14e7ff] text-white p-6 rounded-lg mb-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold tracking-wide mb-1">
-                  FINSURE
-                </h1>
-                <p className="text-sm opacity-90">
-                  Financial Management System
-                </p>
+              <div className="flex items-center gap-4">
+                <svg width="56" height="56" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                  <rect x="2" y="2" width="44" height="44" rx="11" fill="#ffffff" />
+                  <rect x="14" y="12" width="5" height="24" rx="1.5" fill="#0c111a" />
+                  <rect x="14" y="12" width="20" height="5" rx="1.5" fill="#0c111a" />
+                  <rect x="14" y="22" width="14" height="4.5" rx="1.5" fill="#0c111a" />
+                  <path d="M14 34 L22 28 L28 31 L36 20" stroke="#0c111a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  <circle cx="36" cy="20" r="2" fill="#0c111a" />
+                </svg>
+                <div>
+                  <h1 className="text-4xl font-bold tracking-wide mb-1">
+                    FINSURE
+                  </h1>
+                  <p className="text-sm opacity-90">
+                    Financial Management System
+                  </p>
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-xs opacity-90">Report ID</div>
@@ -1057,7 +1067,29 @@ export const Reports: React.FC = () => {
         </button>
       </div>
 
-      {/* Reports Grid */}
+      {/* Empty state */}
+      {reports.length === 0 ? (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-10 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-full bg-[#14e7ff]/10 flex items-center justify-center mb-5">
+            <FileText className="w-8 h-8 text-[#14e7ff]" />
+          </div>
+          <h3 className="text-[var(--text-primary)] text-xl font-semibold mb-2">
+            No reports yet
+          </h3>
+          <p className="text-[var(--text-secondary)] max-w-md mb-6">
+            Once you have transactions, you can generate income, tax, and cash
+            flow reports here. Click the button above to create your first one.
+          </p>
+          <button
+            onClick={() => setShowGenerateModal(true)}
+            className="inline-flex items-center gap-2 bg-[#14e7ff] hover:bg-[#0fc9de] text-black font-medium px-5 py-2.5 rounded-md transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Generate your first report
+          </button>
+        </div>
+      ) : (
+      /* Reports Grid */
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {reports.map((report) => (
           <div
@@ -1103,6 +1135,7 @@ export const Reports: React.FC = () => {
           </div>
         ))}
       </div>
+      )}
 
       {/* Generate Modal */}
       {showGenerateModal && (

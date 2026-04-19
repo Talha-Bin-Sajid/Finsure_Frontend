@@ -54,15 +54,24 @@ export const authApi = {
 
 // ================= UPLOAD API =================
 export const uploadApi = {
+  /**
+   * Uploads a statement. The frontend picks a specific bank now (instead of
+   * the old Bank-vs-Wallet generic "file_type"); we derive the file_type
+   * the backend expects from the bank's `isMobileWallet` flag.
+   */
   uploadStatement: async (
     file: File,
-    fileType: string,
+    bank: { slug: string; isMobileWallet: boolean },
     password?: string | null
   ) => {
     const formData = new FormData();
 
     formData.append("file", file);
-    formData.append("file_type", fileType);
+    formData.append("bank_name", bank.slug);
+    formData.append(
+      "file_type",
+      bank.isMobileWallet ? "mobile_wallet_statement" : "bank_statement"
+    );
 
     if (password) {
       formData.append("password", password);
@@ -119,13 +128,32 @@ export const extractionApi = {
   },
 };
 
+// ================= BANKS API =================
+
+export interface Bank {
+  id: number;
+  name: string;
+  slug: string;
+  isMobileWallet: boolean;
+  requiresPassword: boolean;
+}
+
+export const banksApi = {
+  getAll: async (): Promise<Bank[]> => {
+    const res = await apiClient.get("/api/v1/banks");
+    return res.data?.banks ?? [];
+  },
+};
+
 // ================= REPORTS API =================
 
 export const reportsApi = {
   // Get all reports
   getAll: async () => {
     const res = await apiClient.get("/api/v1/reports");
-    return res.data.reports;
+    // BE returns {success:false} (no reports key) for users with no reports
+    // yet — normalize to [] so the caller can always .map() safely.
+    return res.data?.reports ?? [];
   },
 
   // Generate report

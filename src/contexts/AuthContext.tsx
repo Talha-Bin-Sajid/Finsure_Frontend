@@ -58,7 +58,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const savedUser = localStorage.getItem("user");
 
     if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsed = JSON.parse(savedUser) as User;
+      // Always regenerate the avatar from the current generator so existing
+      // sessions pick up style changes (e.g. initials swap) without re-login.
+      const refreshed: User = { ...parsed, avatar: generateAvatar(parsed.name) };
+      localStorage.setItem("user", JSON.stringify(refreshed));
+      setUser(refreshed);
     }
     setIsLoading(false);
   }, []);
@@ -118,7 +123,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         login,
         signup,
         logout,
-        updateUser, 
+        updateUser,
         isLoading,
       }}
     >

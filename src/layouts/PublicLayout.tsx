@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { MobileNav } from '../components/MobileNav';
+import { Logo } from '../components/Logo';
 
 export const PublicLayout: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -13,7 +14,9 @@ export const PublicLayout: React.FC = () => {
 
       <div className={`transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         <header className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] px-4 md:px-6 py-3 flex items-center justify-between">
-          <h1 className="text-xl md:text-2xl font-bold text-[#14e7ff] md:hidden">FINSURE</h1>
+          <div className="md:hidden">
+            <Logo variant="inline" size={28} />
+          </div>
           <div className="flex items-center gap-3 ml-auto">
             <button
               onClick={() => navigate('/login')}

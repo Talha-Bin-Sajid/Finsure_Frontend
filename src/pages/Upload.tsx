@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Upload as UploadIcon,
   File,
@@ -7,14 +7,17 @@ import {
   Loader,
   Eye,
   EyeOff,
+  Landmark,
 } from "lucide-react";
-import { uploadApi } from "../services/apiClient";
+import { uploadApi, banksApi, Bank } from "../services/apiClient";
 import { toast } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 
 export const Upload: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const [fileTypes, setFileTypes] = useState<{ [key: string]: string }>({});
+  // Per-file bank slug ("meezan", "easypaisa", ...) -- drives the BE parser
+  // choice and whether a password is required.
+  const [fileBanks, setFileBanks] = useState<{ [key: string]: string }>({});
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [filePasswords, setFilePasswords] = useState<{ [key: string]: string }>(
@@ -23,8 +26,15 @@ export const Upload: React.FC = () => {
   const [showPassword, setShowPassword] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const [banks, setBanks] = useState<Bank[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    banksApi.getAll().then(setBanks).catch(() => setBanks([]));
+  }, []);
+
+  const bankBySlug = (slug: string) => banks.find((b) => b.slug === slug);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -54,9 +64,9 @@ export const Upload: React.FC = () => {
 
     setFiles(files.filter((_, i) => i !== index));
 
-    const newFileTypes = { ...fileTypes };
-    delete newFileTypes[fileName];
-    setFileTypes(newFileTypes);
+    const newFileBanks = { ...fileBanks };
+    delete newFileBanks[fileName];
+    setFileBanks(newFileBanks);
 
     const newPasswords = { ...filePasswords };
     delete newPasswords[fileName];
@@ -69,19 +79,21 @@ export const Upload: React.FC = () => {
       return;
     }
 
-    const missingTypes = files.filter((file) => !fileTypes[file.name]);
-    if (missingTypes.length > 0) {
-      toast.error("Please select a type for all files");
+    const missingBanks = files.filter((file) => !fileBanks[file.name]);
+    if (missingBanks.length > 0) {
+      toast.error("Please choose a bank for every file");
       return;
     }
 
-    const missingPasswords = files.filter(
-      (file) =>
-        fileTypes[file.name] === "bank_statement" && !filePasswords[file.name]
-    );
+    const missingPasswords = files.filter((file) => {
+      const bank = bankBySlug(fileBanks[file.name]);
+      return bank?.requiresPassword && !filePasswords[file.name];
+    });
 
     if (missingPasswords.length > 0) {
-      toast.error("Password is required for all bank statements");
+      toast.error(
+        "A statement password is required for the selected bank(s)"
+      );
       return;
     }
 
@@ -90,12 +102,12 @@ export const Upload: React.FC = () => {
 
     try {
       for (let i = 0; i < files.length; i++) {
+        const bank = bankBySlug(fileBanks[files[i].name]);
+        if (!bank) continue; // guarded by missingBanks check above
         await uploadApi.uploadStatement(
           files[i],
-          fileTypes[files[i].name],
-          fileTypes[files[i].name] === "bank_statement"
-            ? filePasswords[files[i].name]
-            : null
+          { slug: bank.slug, isMobileWallet: bank.isMobileWallet },
+          bank.requiresPassword ? filePasswords[files[i].name] : null
         );
 
         setUploadProgress(((i + 1) / files.length) * 100);
@@ -148,6 +160,23 @@ export const Upload: React.FC = () => {
         />
       </div>
 
+      {banks.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--text-secondary)]">
+          <span className="inline-flex items-center gap-1.5 text-[var(--text-primary)] font-medium">
+            <Landmark className="w-4 h-4 text-[#14e7ff]" />
+            Supported banks:
+          </span>
+          {banks.map((b) => (
+            <span
+              key={b.id}
+              className="px-2.5 py-1 rounded-full bg-[#14e7ff]/10 border border-[#14e7ff]/30 text-[#14e7ff] text-xs font-medium"
+            >
+              {b.name}
+            </span>
+          ))}
+        </div>
+      )}
+
       {files.length > 0 && (
         <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-6">
           <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4">
@@ -169,20 +198,21 @@ export const Upload: React.FC = () => {
                   </p>
                 </div>
                 <select
-                  value={fileTypes[file.name] || ""}
+                  value={fileBanks[file.name] || ""}
                   onChange={(e) =>
-                    setFileTypes({ ...fileTypes, [file.name]: e.target.value })
+                    setFileBanks({ ...fileBanks, [file.name]: e.target.value })
                   }
                   className="bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-3 py-2 focus:border-[#14e7ff] focus:outline-none"
                   disabled={isUploading}
                 >
-                  <option value="">Select type</option>
-                  <option value="bank_statement">Bank Statement</option>
-                  <option value="mobile_wallet_statement">
-                    Mobile Wallet Statement
-                  </option>
+                  <option value="">Select bank</option>
+                  {banks.map((b) => (
+                    <option key={b.id} value={b.slug}>
+                      {b.name}
+                    </option>
+                  ))}
                 </select>
-                {fileTypes[file.name] === "bank_statement" && (
+                {bankBySlug(fileBanks[file.name])?.requiresPassword && (
                   <div className="relative w-56">
                     <input
                       type={showPassword[file.name] ? "text" : "password"}
@@ -263,7 +293,8 @@ export const Upload: React.FC = () => {
               <button
                 onClick={() => {
                   setFiles([]);
-                  setFileTypes({});
+                  setFileBanks({});
+                  setFilePasswords({});
                 }}
                 className="px-6 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-[var(--border-color)] py-3 rounded-lg font-medium transition-colors"
               >

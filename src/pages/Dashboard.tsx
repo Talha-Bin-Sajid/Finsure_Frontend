@@ -15,6 +15,8 @@ import {
   accountsApi,
   historyApi,
   dashboardApi,
+  banksApi,
+  Bank,
 } from "../services/apiClient";
 import { toast } from "../utils/toast";
 
@@ -48,7 +50,14 @@ export const Dashboard: React.FC = () => {
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [isSubmittingAccount, setIsSubmittingAccount] = useState(false);
+  const [banks, setBanks] = useState<Bank[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch the list of banks FINSURE supports so the 'Add Account' dropdown
+    // stays in sync with what the backend can parse.
+    banksApi.getAll().then(setBanks).catch(() => setBanks([]));
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -233,8 +242,11 @@ export const Dashboard: React.FC = () => {
                 className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded px-3 py-2 text-[var(--text-primary)] focus:border-[#14e7ff] outline-none"
               >
                 <option value="">Select Bank</option>
-                <option value="Meezan">Meezan Bank</option>
-                <option value="Easypaisa">EasyPaisa</option>
+                {banks.map((b) => (
+                  <option key={b.id} value={b.name}>
+                    {b.name}
+                  </option>
+                ))}
               </select>
 
               <input

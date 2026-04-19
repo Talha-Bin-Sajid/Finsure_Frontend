@@ -4,6 +4,7 @@ import { Mail, Lock, Loader, Eye, EyeOff } from 'lucide-react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from '../utils/toast';
+import { Logo } from '../components/Logo';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -32,9 +33,9 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#14e7ff] mb-2">FINSURE</h1>
-          <p className="text-[var(--text-secondary)]">Financial Insights & Secure Reporting</p>
+        <div className="flex flex-col items-center text-center mb-8">
+          <Logo variant="full" size={56} wordmarkClassName="text-4xl" />
+          <p className="text-[var(--text-secondary)] mt-3">Financial Insights & Secure Reporting</p>
         </div>
 
         <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8 shadow-xl">

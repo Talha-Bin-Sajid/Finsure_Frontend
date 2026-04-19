@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { Logo } from './Logo';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -55,11 +56,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
     >
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
-          {!isCollapsed && (
-            <h1 className="text-2xl font-bold text-[#14e7ff]">FINSURE</h1>
-          )}
-          {isCollapsed && (
-            <h1 className="text-2xl font-bold text-[#14e7ff]">F</h1>
+          {!isCollapsed ? (
+            <Logo variant="full" size={32} />
+          ) : (
+            <Logo variant="mark" size={32} />
           )}
           <button
             onClick={onToggle}
