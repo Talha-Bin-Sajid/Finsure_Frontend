@@ -1,44 +1,31 @@
-import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { Sidebar } from '../components/Sidebar';
-import { MobileNav } from '../components/MobileNav';
-import { Logo } from '../components/Logo';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { PublicNavbar } from "../components/public/PublicNavbar";
+import { PublicFooter } from "../components/public/PublicFooter";
 
+/**
+ * Public marketing shell.
+ *
+ * Fixed translucent nav + page content + footer. We deliberately do NOT
+ * wrap <Outlet /> in <AnimatePresence mode="wait">: Outlet reads the live
+ * router context, so the exiting page instantly flips to the new route's
+ * content mid-exit. Combined with per-page layoutId pills (Pricing's
+ * billing toggle, nav pill) that raced on route change and crashed the
+ * render. Each page does its own entrance animation on mount.
+ */
 export const PublicLayout: React.FC = () => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
-      <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+    <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      <PublicNavbar />
 
-      <div className={`transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
-        <header className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] px-4 md:px-6 py-3 flex items-center justify-between">
-          <div className="md:hidden">
-            <Logo variant="inline" size={28} />
-          </div>
-          <div className="flex items-center gap-3 ml-auto">
-            <button
-              onClick={() => navigate('/login')}
-              className="text-[var(--text-primary)] hover:text-[#14e7ff] px-4 py-2 transition-colors"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate('/signup')}
-              className="bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              Sign Up
-            </button>
-          </div>
-        </header>
+      {/* Spacer so content isn't hidden under the fixed navbar */}
+      <div className="h-16" aria-hidden />
 
-        <main className="p-4 md:p-6 pb-20 md:pb-6">
-          <Outlet />
-        </main>
-      </div>
+      <main className="flex-1">
+        <Outlet />
+      </main>
 
-      <MobileNav />
+      <PublicFooter />
     </div>
   );
 };

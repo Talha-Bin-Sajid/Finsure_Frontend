@@ -122,7 +122,13 @@ export const extractionApi = {
       date: t.date ? t.date.split("T")[0] : "",
 
       amount: t.amount,
-      category: t.category === "credit" ? "income" : "expense",
+      // Real category from the categorization pipeline (e.g. "Food", "Rent",
+      // "Uncategorized"). Previously this field was being overwritten with
+      // income/expense derived from trxType.
+      category: t.category || "Uncategorized",
+      // credit / debit — used to color amount green vs red
+      trxType: t.trxType,
+      categorizedBy: t.categorizedBy ?? null,
       taxable: t.taxable === "true" || t.taxable === true,
     }));
   },
@@ -156,50 +162,14 @@ export const reportsApi = {
     return res.data?.reports ?? [];
   },
 
-  // Generate report
+  // Generate report — all three types hit the real backend now.
   generate: async (reportType: string, startDate: string, endDate: string) => {
-    // REAL API ONLY for income_expense
-    if (reportType === "income_expense") {
-      const res = await apiClient.post("/api/v1/reports/generate", {
-        reportType,
-        startDate,
-        endDate,
-      });
-
-      return res.data;
-    }
-
-    // MOCK for others
-    await delay(800);
-    const template = (mockData as any).reportTemplates[reportType];
-    if (!template) throw new Error("Template not found");
-
-    const newReportId = `r${Date.now()}`;
-
-    const report = {
-      id: newReportId,
-      title:
-        reportType === "tax_summary"
-          ? "Tax Summary Report"
-          : "Cash Flow Analysis",
-      generatedDate: new Date().toISOString(),
-      type: reportType,
-      dateRange: `${startDate} to ${endDate}`,
-    };
-
-    const detailedReport = {
-      ...template,
-      reportId: newReportId,
-      title: report.title,
-      dateRange: report.dateRange,
-      generatedDate: report.generatedDate,
-    };
-
-    generatedReports.unshift(report);
-    generatedDetailedReports.push(detailedReport);
-    detailedReportsMap.set(newReportId, detailedReport);
-
-    return { report };
+    const res = await apiClient.post("/api/v1/reports/generate", {
+      reportType,
+      startDate,
+      endDate,
+    });
+    return res.data;
   },
 
   //Get detailed report

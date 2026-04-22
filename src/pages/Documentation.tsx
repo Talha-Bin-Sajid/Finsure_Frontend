@@ -9,7 +9,9 @@ import {
   Settings,
   Shield,
   ChevronRight,
+  Sparkles,
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 import dashboard from "../assets/dashboard.webp";
 import dashboards from "../assets/dashboards.webp";
@@ -45,37 +47,69 @@ export const Documentation: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-8">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
-          FINSURE Documentation
-        </h1>
-        <p className="text-xl text-[var(--text-primary)] opacity-80">
-          Complete guide to managing your financial data with FINSURE
-        </p>
-      </div>
+      {/* Hero */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] p-8 md:p-10 mb-10 text-center"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-70"
+          style={{
+            background:
+              "radial-gradient(circle, color-mix(in srgb, var(--accent) 25%, transparent) 0%, transparent 65%)",
+          }}
+        />
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[color:var(--accent-ring)] bg-[color:var(--accent-soft)] text-[color:var(--accent)] text-xs font-medium">
+            <Sparkles size={12} />
+            Documentation
+          </div>
+          <h1 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]">
+            FINSURE handbook
+          </h1>
+          <p className="mt-3 text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
+            Everything you need to upload statements, review extractions, and
+            make sense of your financial data — in one place.
+          </p>
+        </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Navigation */}
         <div className="lg:col-span-1">
-          <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 sticky top-4">
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
-              Quick Navigation
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-3 sticky top-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] px-2 pt-1 pb-2">
+              On this page
             </h3>
-            <nav className="space-y-2">
+            <nav className="space-y-1 relative">
               {sections.map((section) => {
                 const Icon = section.icon;
+                const active = activeSection === section.id;
                 return (
                   <button
                     key={section.id}
                     onClick={() => scrollToSection(section.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                      activeSection === section.id
-                        ? "bg-[#14e7ff]/10 text-[#14e7ff] border border-[#14e7ff]/30"
-                        : "text-[var(--text-primary)] opacity-70 hover:opacity-100 hover:bg-[var(--bg-primary)]"
-                    }`}
+                    className="relative w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-colors text-sm font-medium"
                   >
-                    <Icon size={18} />
-                    <span className="text-sm font-medium">{section.title}</span>
+                    {active && (
+                      <motion.span
+                        layoutId="doc-nav-pill"
+                        className="absolute inset-0 rounded-xl bg-[color:var(--accent-soft)] border border-[color:var(--accent-ring)]"
+                        transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      />
+                    )}
+                    <span
+                      className={`relative flex items-center gap-3 ${
+                        active
+                          ? "text-[color:var(--accent)]"
+                          : "text-[var(--text-primary)] hover:text-[color:var(--accent)]"
+                      }`}
+                    >
+                      <Icon size={16} />
+                      {section.title}
+                    </span>
                   </button>
                 );
               })}
@@ -88,11 +122,11 @@ export const Documentation: React.FC = () => {
           {/* Getting Started */}
           <section
             id="getting-started"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <BookOpen className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <BookOpen className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Getting Started
@@ -122,7 +156,7 @@ export const Documentation: React.FC = () => {
                 <ul className="space-y-2 ml-4">
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -132,14 +166,14 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>Automated data extraction with 95-99% accuracy</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -149,7 +183,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -159,7 +193,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -169,7 +203,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -178,7 +212,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -199,7 +233,7 @@ export const Documentation: React.FC = () => {
                 <ul className="space-y-2 ml-4">
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -209,7 +243,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -219,7 +253,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -229,7 +263,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={18}
                     />
                     <span>
@@ -259,11 +293,11 @@ export const Documentation: React.FC = () => {
           {/* Upload Documents */}
           <section
             id="upload-documents"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <Upload className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <Upload className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Upload Documents
@@ -300,7 +334,7 @@ export const Documentation: React.FC = () => {
                     <ul className="mt-2 ml-4 space-y-1">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -310,7 +344,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -331,7 +365,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-1">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -341,7 +375,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -351,7 +385,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -361,7 +395,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -383,14 +417,14 @@ export const Documentation: React.FC = () => {
                     <ul className="mt-2 ml-4 space-y-1">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>Scan the file for security threats</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -399,7 +433,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -409,7 +443,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -418,7 +452,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -444,14 +478,14 @@ export const Documentation: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-[#14e7ff]/10 border border-[#14e7ff]/30 rounded-lg p-4">
-                <h4 className="font-semibold text-[#14e7ff] mb-2">
+              <div className="bg-[color:var(--accent-soft)] border border-[color:var(--accent)]/30 rounded-lg p-4">
+                <h4 className="font-semibold text-[color:var(--accent)] mb-2">
                   💡 Tips for Best Results
                 </h4>
                 <ul className="space-y-2 ml-4 text-[var(--text-primary)] opacity-80">
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -461,7 +495,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -470,7 +504,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -479,7 +513,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -494,11 +528,11 @@ export const Documentation: React.FC = () => {
           {/* Extraction Review */}
           <section
             id="extraction-review"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <FileCheck className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <FileCheck className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Extraction and Review
@@ -528,7 +562,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -538,7 +572,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -548,7 +582,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -558,7 +592,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -568,7 +602,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -578,7 +612,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -595,7 +629,7 @@ export const Documentation: React.FC = () => {
                     </h4>
                     <ol className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           1.
                         </span>
                         <span>
@@ -604,7 +638,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           2.
                         </span>
                         <span>
@@ -613,7 +647,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           3.
                         </span>
                         <span>
@@ -634,7 +668,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-1">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -644,7 +678,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -671,14 +705,14 @@ export const Documentation: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-[#14e7ff]/10 border border-[#14e7ff]/30 rounded-lg p-4">
-                <h4 className="font-semibold text-[#14e7ff] mb-2">
+              <div className="bg-[color:var(--accent-soft)] border border-[color:var(--accent)]/30 rounded-lg p-4">
+                <h4 className="font-semibold text-[color:var(--accent)] mb-2">
                   ⚡ Quick Actions
                 </h4>
                 <ul className="space-y-2 ml-4 text-[var(--text-primary)] opacity-80">
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -688,7 +722,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -697,7 +731,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -712,11 +746,11 @@ export const Documentation: React.FC = () => {
           {/* Upload History */}
           <section
             id="upload-history"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <History className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <History className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Upload History
@@ -745,7 +779,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -755,7 +789,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -765,7 +799,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -775,7 +809,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -785,7 +819,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -795,7 +829,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -813,7 +847,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -825,7 +859,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -836,7 +870,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -854,7 +888,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -864,7 +898,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -896,11 +930,11 @@ export const Documentation: React.FC = () => {
           {/* Generated Reports */}
           <section
             id="reports"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <BarChart3 className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <BarChart3 className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Generated Reports
@@ -927,7 +961,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-3">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <div>
@@ -940,7 +974,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <div>
@@ -953,7 +987,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <div>
@@ -966,7 +1000,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <div>
@@ -988,7 +1022,7 @@ export const Documentation: React.FC = () => {
                     </h4>
                     <ol className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           1.
                         </span>
                         <span>
@@ -997,7 +1031,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           2.
                         </span>
                         <span>
@@ -1006,7 +1040,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           3.
                         </span>
                         <span>
@@ -1015,7 +1049,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           4.
                         </span>
                         <span>
@@ -1032,7 +1066,7 @@ export const Documentation: React.FC = () => {
                     </h4>
                     <ol className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           1.
                         </span>
                         <span>
@@ -1040,13 +1074,13 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           2.
                         </span>
                         <span>Select report type and date range</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           3.
                         </span>
                         <span>
@@ -1073,14 +1107,14 @@ export const Documentation: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-[#14e7ff]/10 border border-[#14e7ff]/30 rounded-lg p-4">
-                <h4 className="font-semibold text-[#14e7ff] mb-2">
+              <div className="bg-[color:var(--accent-soft)] border border-[color:var(--accent)]/30 rounded-lg p-4">
+                <h4 className="font-semibold text-[color:var(--accent)] mb-2">
                   📊 Report Benefits
                 </h4>
                 <ul className="space-y-2 ml-4 text-[var(--text-primary)] opacity-80">
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -1090,7 +1124,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -1100,7 +1134,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -1115,11 +1149,11 @@ export const Documentation: React.FC = () => {
           {/* Visual Dashboards */}
           <section
             id="dashboards"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <PieChart className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <PieChart className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Visual Dashboards
@@ -1145,7 +1179,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1154,7 +1188,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1163,7 +1197,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1173,7 +1207,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1190,7 +1224,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1200,7 +1234,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1210,7 +1244,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1219,7 +1253,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1237,7 +1271,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1247,7 +1281,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1256,7 +1290,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1266,7 +1300,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1283,7 +1317,7 @@ export const Documentation: React.FC = () => {
                     </h4>
                     <ol className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           1.
                         </span>
                         <span>
@@ -1292,7 +1326,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           2.
                         </span>
                         <span>
@@ -1301,7 +1335,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           3.
                         </span>
                         <span>
@@ -1309,7 +1343,7 @@ export const Documentation: React.FC = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-[#14e7ff] font-semibold flex-shrink-0">
+                        <span className="text-[color:var(--accent)] font-semibold flex-shrink-0">
                           4.
                         </span>
                         <span>
@@ -1336,14 +1370,14 @@ export const Documentation: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-[#14e7ff]/10 border border-[#14e7ff]/30 rounded-lg p-4">
-                <h4 className="font-semibold text-[#14e7ff] mb-2">
+              <div className="bg-[color:var(--accent-soft)] border border-[color:var(--accent)]/30 rounded-lg p-4">
+                <h4 className="font-semibold text-[color:var(--accent)] mb-2">
                   💡 Dashboard Tips
                 </h4>
                 <ul className="space-y-2 ml-4 text-[var(--text-primary)] opacity-80">
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -1353,7 +1387,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -1363,7 +1397,7 @@ export const Documentation: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight
-                      className="text-[#14e7ff] flex-shrink-0 mt-1"
+                      className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                       size={16}
                     />
                     <span>
@@ -1378,11 +1412,11 @@ export const Documentation: React.FC = () => {
           {/* Account Settings */}
           <section
             id="settings"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <Settings className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <Settings className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Account Settings
@@ -1408,7 +1442,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1417,7 +1451,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1427,7 +1461,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1437,7 +1471,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1457,7 +1491,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1467,7 +1501,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1477,7 +1511,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1498,7 +1532,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1507,14 +1541,14 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>Alerts when document processing completes</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>Weekly financial summary emails</span>
@@ -1529,7 +1563,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1539,7 +1573,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1549,7 +1583,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1581,11 +1615,11 @@ export const Documentation: React.FC = () => {
           {/* Security Features */}
           <section
             id="security"
-            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 scroll-mt-6 hover:border-[color:var(--accent)]/40 transition-colors"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#14e7ff]/10 rounded-lg flex items-center justify-center">
-                <Shield className="text-[#14e7ff]" size={24} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_30px_-10px_var(--accent-glow)] bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-hover)]">
+                <Shield className="text-white" size={22} />
               </div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Security Features
@@ -1613,7 +1647,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1622,7 +1656,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1631,7 +1665,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1641,14 +1675,14 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>Enter verification code to confirm setup</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1669,7 +1703,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1679,14 +1713,14 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>Current session is clearly marked as Active</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1695,7 +1729,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1713,7 +1747,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1723,7 +1757,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1733,7 +1767,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1743,7 +1777,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1753,7 +1787,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1771,7 +1805,7 @@ export const Documentation: React.FC = () => {
                     <ul className="ml-4 space-y-2">
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1781,7 +1815,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1790,7 +1824,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1800,7 +1834,7 @@ export const Documentation: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <ChevronRight
-                          className="text-[#14e7ff] flex-shrink-0 mt-1"
+                          className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                           size={16}
                         />
                         <span>
@@ -1827,14 +1861,14 @@ export const Documentation: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-[#14e7ff]/10 border border-[#14e7ff]/30 rounded-lg p-4">
-                  <h4 className="font-semibold text-[#14e7ff] mb-2">
+                <div className="bg-[color:var(--accent-soft)] border border-[color:var(--accent)]/30 rounded-lg p-4">
+                  <h4 className="font-semibold text-[color:var(--accent)] mb-2">
                     🔐 Security Best Practices
                   </h4>
                   <ul className="space-y-2 ml-4 text-[var(--text-primary)] opacity-80">
                     <li className="flex items-start gap-2">
                       <ChevronRight
-                        className="text-[#14e7ff] flex-shrink-0 mt-1"
+                        className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                         size={16}
                       />
                       <span>
@@ -1844,7 +1878,7 @@ export const Documentation: React.FC = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <ChevronRight
-                        className="text-[#14e7ff] flex-shrink-0 mt-1"
+                        className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                         size={16}
                       />
                       <span>
@@ -1853,14 +1887,14 @@ export const Documentation: React.FC = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <ChevronRight
-                        className="text-[#14e7ff] flex-shrink-0 mt-1"
+                        className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                         size={16}
                       />
                       <span>Log out from shared or public devices</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <ChevronRight
-                        className="text-[#14e7ff] flex-shrink-0 mt-1"
+                        className="text-[color:var(--accent)] flex-shrink-0 mt-1"
                         size={16}
                       />
                       <span>

@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, User, Loader, ChevronDown, Eye, EyeOff } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  User,
+  Loader,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Briefcase,
+} from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "../utils/toast";
-import { Logo } from "../components/Logo";
+import { AuthShell } from "../components/auth/AuthShell";
+import { AuthField } from "../components/auth/AuthField";
+import { AnimatedButton } from "../components/ui/AnimatedButton";
 
 export const Signup: React.FC = () => {
   const [name, setName] = useState("");
@@ -25,19 +36,21 @@ export const Signup: React.FC = () => {
       toast.error("Passwords do not match");
       return;
     }
-
     if (password.length < 6) {
       toast.error("Password must be at least 6 characters");
       return;
     }
+    if (!userType) {
+      toast.error("Please select a user type");
+      return;
+    }
 
     setIsLoading(true);
-
     try {
       await signup(email, password, name, userType);
       toast.success("Account created successfully!");
       navigate("/dashboard");
-    } catch (error) {
+    } catch {
       toast.error("Failed to create account");
     } finally {
       setIsLoading(false);
@@ -45,191 +58,150 @@ export const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center text-center mb-8">
-          <Logo variant="full" size={56} wordmarkClassName="text-4xl" />
-          <p className="text-[var(--text-secondary)] mt-3">
-            Financial Insights & Secure Reporting
-          </p>
-        </div>
+    <AuthShell
+      title="Create your account"
+      subtitle="Start free — no credit card required."
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-[color:var(--accent)] hover:text-[color:var(--accent-hover)] font-medium transition-colors"
+          >
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthField
+          label="Full name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          icon={<User size={18} />}
+          placeholder="Jane Doe"
+          autoComplete="name"
+        />
 
-        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8 shadow-xl">
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6">
-            Create Account
-          </h2>
+        <AuthField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          icon={<Mail size={18} />}
+          placeholder="you@company.com"
+          autoComplete="email"
+        />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                Full Name
-              </label>
-              <div className="relative">
-                <User
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]"
-                  size={20}
-                />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-4 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
-                  placeholder="John Doe"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]"
-                  size={20}
-                />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-4 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
-                  placeholder="your.email@example.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                User Type
-              </label>
-
-              <div className="relative group">
-                <User
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
-                  size={20}
-                />
-
-                <ChevronDown
-                  size={20}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]
-                 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                />
-
-                <select
-                  value={userType}
-                  onChange={(e) => setUserType(e.target.value)}
-                  required
-                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)]
-                 pl-10 pr-10 py-3 rounded-lg
-                 border border-[var(--border-color)]
-                 focus:border-[#14e7ff] focus:outline-none
-                 transition-colors
-                 appearance-none cursor-pointer"
-                >
-                  <option value="" disabled>
-                    Select user type
-                  </option>
-
-                  <option value="businessman">
-                    Businessman
-                  </option>
-
-                  <option value="freelancer">
-                    Freelancer
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
-                  size={20}
-                />
-
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-12 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
-                  placeholder="••••••••"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[#14e7ff]"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
-                  size={20}
-                />
-
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-12 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
-                  placeholder="••••••••"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[#14e7ff]"
-                >
-                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        {/* User-type select — reuses the global themed <select> styling */}
+        <div>
+          <label
+            htmlFor="auth-user-type"
+            className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5"
+          >
+            I am a…
+          </label>
+          <div className="relative group">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] group-focus-within:text-[color:var(--accent)] transition-colors">
+              <Briefcase size={18} />
+            </span>
+            <select
+              id="auth-user-type"
+              value={userType}
+              onChange={(e) => setUserType(e.target.value)}
+              required
+              className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-11 py-3 rounded-xl border border-[var(--border-color)] focus:border-[color:var(--accent)] focus:ring-2 focus:ring-[color:var(--accent-ring)] focus:outline-none transition-all"
             >
-              {isLoading ? (
-                <>
-                  <Loader className="animate-spin" size={20} />
-                  <span>Creating account...</span>
-                </>
-              ) : (
-                "Sign Up"
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-[var(--text-secondary)] text-sm">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="text-[#14e7ff] hover:text-[#0ab6ff] transition-colors"
-              >
-                Sign in
-              </Link>
-            </p>
+              <option value="" disabled>
+                Select one
+              </option>
+              <option value="businessman">Business owner</option>
+              <option value="freelancer">Freelancer</option>
+            </select>
           </div>
         </div>
-      </div>
-    </div>
+
+        <AuthField
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          icon={<Lock size={18} />}
+          placeholder="At least 6 characters"
+          autoComplete="new-password"
+          trailing={
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="w-8 h-8 flex items-center justify-center rounded-full text-[var(--text-secondary)] hover:text-[color:var(--accent)] hover:bg-[color:var(--accent-soft)] transition-colors"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          }
+        />
+
+        <AuthField
+          label="Confirm password"
+          type={showConfirmPassword ? "text" : "password"}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          icon={<Lock size={18} />}
+          placeholder="Repeat password"
+          autoComplete="new-password"
+          trailing={
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              aria-label={
+                showConfirmPassword ? "Hide password" : "Show password"
+              }
+              className="w-8 h-8 flex items-center justify-center rounded-full text-[var(--text-secondary)] hover:text-[color:var(--accent)] hover:bg-[color:var(--accent-soft)] transition-colors"
+            >
+              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          }
+        />
+
+        <AnimatedButton
+          type="submit"
+          size="md"
+          className="w-full"
+          disabled={isLoading}
+          trailingIcon={
+            isLoading ? (
+              <Loader className="animate-spin" size={16} />
+            ) : (
+              <ArrowRight size={16} />
+            )
+          }
+        >
+          {isLoading ? "Creating account…" : "Create account"}
+        </AnimatedButton>
+
+        <p className="text-xs text-center text-[var(--text-secondary)]">
+          By signing up you agree to our{" "}
+          <Link
+            to="/"
+            className="text-[color:var(--accent)] hover:underline"
+          >
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link
+            to="/"
+            className="text-[color:var(--accent)] hover:underline"
+          >
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </form>
+    </AuthShell>
   );
 };

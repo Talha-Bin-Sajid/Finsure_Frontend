@@ -1,100 +1,172 @@
-import React, { useState } from 'react';
-import { Search, Bell, Upload, Menu, LogOut, Sun, Moon } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  Bell,
+  Upload,
+  Menu,
+  LogOut,
+  Sun,
+  Moon,
+  Settings as SettingsIcon,
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 interface TopbarProps {
   onMenuClick?: () => void;
 }
 
+/**
+ * Sticky glass topbar for authenticated pages.
+ *
+ * Mirrors the public nav's aesthetic: backdrop blur, accent-tinted icon
+ * buttons, and a primary "Upload" CTA that matches the AnimatedButton style.
+ */
 export const Topbar: React.FC<TopbarProps> = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close profile menu on outside click.
+  useEffect(() => {
+    if (!showProfileMenu) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [showProfileMenu]);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
-    <header className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-4">
+    <header className="sticky top-0 z-30 bg-[var(--bg-primary)]/70 backdrop-blur-xl border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-3">
       <button
         onClick={onMenuClick}
-        className="md:hidden text-[var(--text-primary)] hover:text-[#14e7ff] transition-colors"
+        className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:text-[color:var(--accent)] hover:bg-[color:var(--accent-soft)] transition-colors"
         aria-label="Open menu"
       >
-        <Menu size={24} />
+        <Menu size={20} />
       </button>
 
+      {/* Search */}
       <div className="flex-1 max-w-2xl">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]" size={20} />
+        <div className="relative group">
+          <Search
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] group-focus-within:text-[color:var(--accent)] transition-colors"
+            size={18}
+          />
           <input
             type="text"
-            placeholder="Search transactions, reports..."
-            className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
+            placeholder="Search transactions, reports, files…"
+            className="w-full bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/70 pl-10 pr-4 py-2.5 rounded-xl border border-[var(--border-color)] focus:border-[color:var(--accent)] focus:ring-2 focus:ring-[color:var(--accent-ring)] focus:outline-none transition-all text-sm"
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => navigate('/upload')}
-          className="hidden sm:flex items-center gap-2 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-4 py-2 rounded-lg font-medium transition-colors"
+      {/* Actions */}
+      <div className="flex items-center gap-2">
+        <motion.button
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => navigate("/upload")}
+          className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm text-white shadow-[0_10px_30px_-12px_var(--accent-glow)]"
+          style={{
+            background:
+              "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+          }}
         >
-          <Upload size={18} />
+          <Upload size={16} />
           <span>Upload</span>
-        </button>
+        </motion.button>
 
         <button
           onClick={toggleTheme}
-          className="text-[var(--text-primary)] hover:text-[#14e7ff] transition-colors p-2 rounded-lg hover:bg-[var(--bg-tertiary)]"
+          className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:text-[color:var(--accent)] hover:bg-[color:var(--accent-soft)] transition-colors"
           aria-label="Toggle theme"
         >
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={theme}
+              initial={{ rotate: -90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: 90, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </motion.span>
+          </AnimatePresence>
         </button>
 
-        <button className="relative text-[var(--text-primary)] hover:text-[#14e7ff] transition-colors">
-          <Bell size={20} />
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#14e7ff] rounded-full"></span>
+        <button
+          className="relative w-9 h-9 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:text-[color:var(--accent)] hover:bg-[color:var(--accent-soft)] transition-colors"
+          aria-label="Notifications"
+        >
+          <Bell size={18} />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[color:var(--accent)] rounded-full ring-2 ring-[var(--bg-primary)]" />
         </button>
 
         {user && (
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             <button
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="flex items-center gap-2"
+              onClick={() => setShowProfileMenu((v) => !v)}
+              className="flex items-center gap-2 p-0.5 rounded-full hover:bg-[var(--bg-tertiary)] transition-colors"
+              aria-label="Open profile menu"
             >
               <img
                 src={user.avatar}
                 alt={user.name}
-                className="w-8 h-8 rounded-full border-2 border-[#14e7ff]"
+                className="w-8 h-8 rounded-full ring-2 ring-[color:var(--accent-ring)]"
               />
             </button>
 
-            {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-lg py-2 z-50">
-                <button
-                  onClick={() => {
-                    navigate('/settings');
-                    setShowProfileMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors"
+            <AnimatePresence>
+              {showProfileMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2 w-56 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-[0_20px_60px_-20px_rgba(0,0,0,0.4)] py-1 z-50 overflow-hidden"
                 >
-                  Settings
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors flex items-center gap-2"
-                >
-                  <LogOut size={16} />
-                  <span>Logout</span>
-                </button>
-              </div>
-            )}
+                  <div className="px-3 py-2 border-b border-[var(--border-color)]">
+                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-[var(--text-secondary)] truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigate("/settings");
+                      setShowProfileMenu(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors flex items-center gap-2"
+                  >
+                    <SettingsIcon size={14} />
+                    Settings
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2"
+                  >
+                    <LogOut size={14} />
+                    Log out
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>

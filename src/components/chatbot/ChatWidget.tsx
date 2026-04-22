@@ -1,12 +1,16 @@
 import React, { useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useChatbot } from "./ChatbotContext";
 import { ChatPanel } from "./ChatPanel";
 
-/** Floating bottom-right chat launcher + sliding panel.
+/**
+ * Floating bottom-right launcher + sliding panel.
  *
- * The button is sticky (fixed) to the viewport so it stays visible as the
- * user scrolls. Clicking it toggles a panel that mounts `ChatPanel`. */
+ * - FAB gets a subtle accent halo pulse while idle so it doesn't feel dead.
+ * - Panel slides in from bottom-right with a spring pop, crossfading with
+ *   the FAB icon (Message <-> X) as it opens.
+ */
 export const ChatWidget: React.FC = () => {
   const { isOpen, toggle, close, unread } = useChatbot();
 
@@ -23,56 +27,92 @@ export const ChatWidget: React.FC = () => {
   return (
     <>
       {/* Floating action button */}
-      <button
+      <motion.button
         type="button"
         onClick={toggle}
         aria-label={isOpen ? "Close chat" : "Open FINSURE Assistant"}
         aria-expanded={isOpen}
         aria-controls="finsure-chat-widget-panel"
-        className={[
-          "fixed z-[60] right-5 bottom-5 md:right-6 md:bottom-6",
-          "w-14 h-14 rounded-full flex items-center justify-center",
-          "bg-[#0ab6ff] text-black shadow-[0_10px_30px_-8px_rgba(20,231,255,0.55),0_0_0_1px_rgba(20,231,255,0.45)]",
-          "hover:bg-[#14e7ff] transition-all duration-200",
-          "focus:outline-none focus-visible:ring-4 focus-visible:ring-[#14e7ff]/35",
-          isOpen ? "rotate-0" : "hover:scale-[1.04]",
-        ].join(" ")}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.94 }}
+        transition={{ type: "spring", stiffness: 350, damping: 22 }}
+        className="fixed z-[60] right-5 bottom-5 md:right-6 md:bottom-6 w-14 h-14 rounded-full flex items-center justify-center text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--accent-ring)]"
+        style={{
+          background:
+            "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+          boxShadow:
+            "0 14px 36px -10px var(--accent-glow), 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent)",
+        }}
       >
-        {isOpen ? <X size={22} strokeWidth={2.2} /> : <MessageCircle size={24} strokeWidth={2.2} />}
+        {/* Idle halo pulse */}
+        {!isOpen && (
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full animate-ping-slow"
+            style={{
+              background:
+                "radial-gradient(circle, color-mix(in srgb, var(--accent) 45%, transparent) 0%, transparent 70%)",
+            }}
+          />
+        )}
+
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={isOpen ? "close" : "open"}
+            initial={{ rotate: -90, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            exit={{ rotate: 90, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="relative z-10 flex"
+          >
+            {isOpen ? (
+              <X size={22} strokeWidth={2.4} />
+            ) : (
+              <MessageCircle size={24} strokeWidth={2.2} />
+            )}
+          </motion.span>
+        </AnimatePresence>
 
         {/* Unread indicator */}
         {!isOpen && unread > 0 && (
-          <span
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 20 }}
             aria-label={`${unread} unread`}
             className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center border-2 border-[var(--bg-primary)]"
           >
             {unread > 9 ? "9+" : unread}
-          </span>
+          </motion.span>
         )}
-      </button>
+      </motion.button>
 
       {/* Panel */}
-      <div
-        id="finsure-chat-widget-panel"
-        role="dialog"
-        aria-modal="false"
-        aria-label="FINSURE Assistant"
-        aria-hidden={!isOpen}
-        className={[
-          "fixed z-[59] right-4 md:right-6",
-          "bottom-[88px] md:bottom-[96px]",
-          "w-[min(380px,calc(100vw-2rem))] h-[min(560px,calc(100vh-120px))]",
-          "rounded-2xl overflow-hidden border border-[var(--border-color)]",
-          "bg-[var(--bg-secondary)] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.55),0_0_0_1px_rgba(20,231,255,0.15)]",
-          "transition-all duration-200 origin-bottom-right",
-          isOpen
-            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-            : "opacity-0 translate-y-2 scale-95 pointer-events-none",
-        ].join(" ")}
-      >
-        {/* Only render the panel contents when open to avoid running effects in the background. */}
-        {isOpen && <ChatPanel showClear />}
-      </div>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            id="finsure-chat-widget-panel"
+            role="dialog"
+            aria-modal="false"
+            aria-label="FINSURE Assistant"
+            initial={{ opacity: 0, y: 16, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+            className="fixed z-[59] right-4 md:right-6 bottom-[88px] md:bottom-[96px] w-[min(400px,calc(100vw-2rem))] h-[min(600px,calc(100vh-120px))] origin-bottom-right"
+          >
+            <div
+              className="w-full h-full rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-secondary)]/95 backdrop-blur-xl"
+              style={{
+                boxShadow:
+                  "0 32px 80px -16px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent)",
+              }}
+            >
+              <ChatPanel showClear />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

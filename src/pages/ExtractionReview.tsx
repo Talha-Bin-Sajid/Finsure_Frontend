@@ -1,38 +1,80 @@
-import React, { useState, useEffect } from "react";
-import { Save, Download, Edit2, Check, X } from "lucide-react";
+import React, { useMemo, useState, useEffect } from "react";
+import {
+  Save,
+  Download,
+  Edit2,
+  Check,
+  X,
+  Sparkles,
+  TrendingUp,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { extractionApi } from "../services/apiClient";
 import { toast } from "../utils/toast";
+import { AnimatedButton } from "../components/ui/AnimatedButton";
 
 interface Transaction {
   id: string;
   date: string;
   amount: number;
   category: string;
+  trxType: string;
+  categorizedBy?: string | null;
   taxable: boolean;
 }
+
+const isIncome = (t: Transaction) => t.trxType === "credit";
+
+const formatMoney = (n: number) =>
+  new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(n);
 
 export const ExtractionReview: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Transaction>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [tab, setTab] = useState<"all" | "income" | "expense">("all");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await extractionApi.getMyTransactions();
         setTransactions(data);
-      } catch (err) {
+      } catch {
         toast.error("Failed to load transactions");
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const categories = ["income", "expense"];
+  const categories = useMemo(
+    () =>
+      Array.from(
+        new Set(transactions.map((t) => t.category || "Uncategorized")),
+      ).sort(),
+    [transactions],
+  );
+
+  const totals = useMemo(() => {
+    const income = transactions
+      .filter(isIncome)
+      .reduce((a, t) => a + t.amount, 0);
+    const expense = transactions
+      .filter((t) => !isIncome(t))
+      .reduce((a, t) => a + t.amount, 0);
+    return { income, expense, net: income - expense };
+  }, [transactions]);
+
+  const filtered = useMemo(() => {
+    if (tab === "income") return transactions.filter(isIncome);
+    if (tab === "expense") return transactions.filter((t) => !isIncome(t));
+    return transactions;
+  }, [tab, transactions]);
 
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id);
@@ -50,33 +92,21 @@ export const ExtractionReview: React.FC = () => {
   };
 
   const exportToCSV = () => {
-    const headers = ["Date", "Amount", "Type", "Taxable"];
-
+    const headers = ["Date", "Amount", "Type", "Category", "Taxable"];
     const rows = transactions.map((t) => [
       t.date,
-
-      // Signed amount based on category
-      t.category === "income"
-        ? `+${t.amount.toFixed(2)}`
-        : `-${t.amount.toFixed(2)}`,
-
-      // Human-readable type
-      t.category === "income" ? "Income" : "Expense",
-
-      // Human-readable taxable
+      isIncome(t) ? `+${t.amount.toFixed(2)}` : `-${t.amount.toFixed(2)}`,
+      isIncome(t) ? "Income" : "Expense",
+      `"${(t.category || "Uncategorized").replace(/"/g, '""')}"`,
       t.taxable ? "Yes" : "No",
     ]);
-
     const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
-
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
     a.download = "transactions.csv";
     a.click();
-
     URL.revokeObjectURL(url);
     toast.success("Exported to CSV");
   };
@@ -84,193 +114,312 @@ export const ExtractionReview: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#14e7ff]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[color:var(--accent)]" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[var(--text-primary)]">
-            Extraction Review
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[color:var(--accent-ring)] bg-[color:var(--accent-soft)] text-[color:var(--accent)] text-xs font-medium"
+          >
+            <Sparkles size={12} />
+            {transactions.length} transactions ready
+          </motion.div>
+          <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+            Extraction review
           </h1>
-          <p className="text-[var(--text-secondary)]">
-            Review and edit extracted transaction data
+          <p className="mt-1 text-[var(--text-secondary)]">
+            Scan what we pulled from your statements. Fix anything that looks
+            off before it lands in reports.
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
+        <div className="flex flex-wrap gap-2">
+          <motion.button
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.97 }}
             onClick={exportToCSV}
-            className="flex items-center gap-2 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[#14e7ff] border border-[#14e7ff] px-4 py-2 rounded-lg font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm text-[color:var(--accent)] border border-[color:var(--accent-ring)] bg-[color:var(--accent-soft)] hover:bg-[var(--bg-tertiary)] transition-colors"
           >
-            <Download size={18} />
-            <span>Export CSV</span>
-          </button>
-          <button className="flex items-center gap-2 bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] px-4 py-2 rounded-lg font-medium transition-colors">
-            <Save size={18} />
-            <span>Save Changes</span>
-          </button>
+            <Download size={16} />
+            Export CSV
+          </motion.button>
+          <AnimatedButton
+            size="sm"
+            onClick={() => toast.info("Saving will be enabled soon")}
+            trailingIcon={<Save size={14} />}
+          >
+            Save changes
+          </AnimatedButton>
         </div>
       </div>
 
-      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg overflow-hidden">
+      {/* Summary strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          {
+            label: "Income",
+            value: totals.income,
+            icon: TrendingUp,
+            accent: "text-emerald-500",
+            tint: "bg-emerald-500/10 border-emerald-500/20",
+          },
+          {
+            label: "Expenses",
+            value: totals.expense,
+            icon: TrendingDown,
+            accent: "text-rose-500",
+            tint: "bg-rose-500/10 border-rose-500/20",
+          },
+          {
+            label: "Net",
+            value: totals.net,
+            icon: Sparkles,
+            accent: "text-[color:var(--accent)]",
+            tint: "bg-[color:var(--accent-soft)] border-[color:var(--accent-ring)]",
+          },
+        ].map((c, i) => (
+          <motion.div
+            key={c.label}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 + i * 0.05 }}
+            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 flex items-center gap-3"
+          >
+            <div className={`w-10 h-10 rounded-xl border ${c.tint} flex items-center justify-center`}>
+              <c.icon size={18} className={c.accent} />
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                {c.label}
+              </p>
+              <p className="text-xl font-bold text-[var(--text-primary)]">
+                PKR {formatMoney(c.value)}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Tab strip */}
+      <div className="relative inline-flex bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-1">
+        {(
+          [
+            { id: "all", label: `All (${transactions.length})` },
+            { id: "income", label: "Income" },
+            { id: "expense", label: "Expenses" },
+          ] as const
+        ).map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`relative px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              tab === t.id
+                ? "text-[color:var(--accent)]"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            {tab === t.id && (
+              <motion.span
+                layoutId="txn-tab-pill"
+                className="absolute inset-0 bg-[color:var(--accent-soft)] border border-[color:var(--accent-ring)] rounded-lg"
+                transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              />
+            )}
+            <span className="relative">{t.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Table */}
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
+            <thead className="bg-[var(--bg-primary)]/70 border-b border-[var(--border-color)]">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Date
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Amount
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Category
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Taxable
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Actions
-                </th>
+                {["Date", "Amount", "Type", "Category", "Taxable", "Actions"].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
             <tbody>
-              {transactions.map((transaction) => (
-                <tr
-                  key={transaction.id}
-                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] transition-colors"
-                >
-                  <td className="px-6 py-4 text-[var(--text-primary)]">
-                    {editingId === transaction.id ? (
-                      <input
-                        type="date"
-                        value={editForm.date}
-                        onChange={(e) =>
-                          setEditForm({ ...editForm, date: e.target.value })
-                        }
-                        className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
-                      />
-                    ) : (
-                      transaction.date
-                    )}
-                  </td>
-                  {/* <td className="px-6 py-4 text-[var(--text-primary)]">
-                    {editingId === transaction.id ? (
-                      <input
-                        type="text"
-                        value={editForm.description}
-                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                        className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
-                      />
-                    ) : (
-                      transaction.description
-                    )}
-                  </td> */}
-                  <td className="px-6 py-4 text-[var(--text-primary)]">
-                    {editingId === transaction.id ? (
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={editForm.amount}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            amount: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-24 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
-                      />
-                    ) : (
-                      <span
-                        className={
-                          transaction.category === "income"
-                            ? "text-green-400"
-                            : "text-red-400"
-                        }
-                      >
-                        PKR {transaction.amount.toFixed(2)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-[var(--text-primary)]">
-                    {editingId === transaction.id ? (
-                      <select
-                        value={editForm.category}
-                        onChange={(e) =>
-                          setEditForm({ ...editForm, category: e.target.value })
-                        }
-                        className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded px-2 py-1 focus:border-[#14e7ff] focus:outline-none"
-                      >
-                        {categories.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat.replace("_", " ")}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <span className="px-2 py-1 bg-[#14e7ff]/10 text-[#14e7ff] rounded text-sm">
-                        {transaction.category.replace("_", " ")}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    {editingId === transaction.id ? (
-                      <input
-                        type="checkbox"
-                        checked={editForm.taxable}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            taxable: e.target.checked,
-                          })
-                        }
-                        className="w-4 h-4 accent-[#14e7ff]"
-                      />
-                    ) : (
-                      <span
-                        className={`px-2 py-1 rounded text-sm ${
-                          transaction.taxable
-                            ? "bg-green-400/10 text-green-400"
-                            : "bg-gray-400/10 text-gray-400"
-                        }`}
-                      >
-                        {transaction.taxable ? "Yes" : "No"}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    {editingId === transaction.id ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={saveEdit}
-                          className="text-green-400 hover:text-green-300 transition-colors"
+              <AnimatePresence initial={false}>
+                {filtered.map((transaction, i) => {
+                  const editing = editingId === transaction.id;
+                  return (
+                    <motion.tr
+                      key={transaction.id}
+                      layout
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ delay: Math.min(i * 0.015, 0.25) }}
+                      className="border-b border-[var(--border-color)] hover:bg-[var(--bg-tertiary)]/50 transition-colors"
+                    >
+                      <td className="px-5 py-3 text-sm text-[var(--text-primary)]">
+                        {editing ? (
+                          <input
+                            type="date"
+                            value={editForm.date}
+                            onChange={(e) =>
+                              setEditForm({ ...editForm, date: e.target.value })
+                            }
+                            className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg px-2 py-1 focus:border-[color:var(--accent)] focus:outline-none"
+                          />
+                        ) : (
+                          transaction.date
+                        )}
+                      </td>
+                      <td className="px-5 py-3 text-sm">
+                        {editing ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editForm.amount}
+                            onChange={(e) =>
+                              setEditForm({
+                                ...editForm,
+                                amount: parseFloat(e.target.value),
+                              })
+                            }
+                            className="w-24 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg px-2 py-1 focus:border-[color:var(--accent)] focus:outline-none"
+                          />
+                        ) : (
+                          <span
+                            className={`inline-flex items-center gap-1 font-medium ${
+                              isIncome(transaction)
+                                ? "text-emerald-500"
+                                : "text-rose-500"
+                            }`}
+                          >
+                            {isIncome(transaction) ? (
+                              <ArrowUpRight size={14} />
+                            ) : (
+                              <ArrowDownRight size={14} />
+                            )}
+                            PKR {formatMoney(transaction.amount)}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
+                            isIncome(transaction)
+                              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                              : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                          }`}
                         >
-                          <Check size={20} />
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          className="text-red-400 hover:text-red-300 transition-colors"
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => startEdit(transaction)}
-                        className="text-[#14e7ff] hover:text-[#0ab6ff] transition-colors"
-                      >
-                        <Edit2 size={20} />
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                          {isIncome(transaction) ? "Income" : "Expense"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-sm">
+                        {editing ? (
+                          <select
+                            value={editForm.category}
+                            onChange={(e) =>
+                              setEditForm({
+                                ...editForm,
+                                category: e.target.value,
+                              })
+                            }
+                            className="bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg px-2 py-1 focus:border-[color:var(--accent)] focus:outline-none"
+                          >
+                            {categories.map((cat) => (
+                              <option key={cat} value={cat}>
+                                {cat.replace("_", " ")}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
+                              transaction.category === "Uncategorized"
+                                ? "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border-[var(--border-color)]"
+                                : "bg-[color:var(--accent-soft)] text-[color:var(--accent)] border-[color:var(--accent-ring)]"
+                            }`}
+                          >
+                            {transaction.category}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3">
+                        {editing ? (
+                          <input
+                            type="checkbox"
+                            checked={editForm.taxable}
+                            onChange={(e) =>
+                              setEditForm({
+                                ...editForm,
+                                taxable: e.target.checked,
+                              })
+                            }
+                            className="w-4 h-4 accent-[color:var(--accent)]"
+                          />
+                        ) : (
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
+                              transaction.taxable
+                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                                : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border-[var(--border-color)]"
+                            }`}
+                          >
+                            {transaction.taxable ? "Yes" : "No"}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3">
+                        {editing ? (
+                          <div className="flex gap-1">
+                            <button
+                              onClick={saveEdit}
+                              aria-label="Save"
+                              className="w-8 h-8 flex items-center justify-center rounded-lg text-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                            >
+                              <Check size={16} />
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              aria-label="Cancel"
+                              className="w-8 h-8 flex items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => startEdit(transaction)}
+                            aria-label="Edit"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:text-[color:var(--accent)] hover:bg-[color:var(--accent-soft)] transition-colors"
+                          >
+                            <Edit2 size={15} />
+                          </button>
+                        )}
+                      </td>
+                    </motion.tr>
+                  );
+                })}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
+        {filtered.length === 0 && (
+          <div className="py-14 text-center text-sm text-[var(--text-secondary)]">
+            No transactions in this view yet.
+          </div>
+        )}
       </div>
     </div>
   );

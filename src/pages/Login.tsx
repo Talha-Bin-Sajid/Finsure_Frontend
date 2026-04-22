@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Loader, Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Mail, Lock, Loader, Eye, EyeOff, ArrowRight } from "lucide-react";
 
-import { useAuth } from '../contexts/AuthContext';
-import { toast } from '../utils/toast';
-import { Logo } from '../components/Logo';
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "../utils/toast";
+import { AuthShell } from "../components/auth/AuthShell";
+import { AuthField } from "../components/auth/AuthField";
+import { AnimatedButton } from "../components/ui/AnimatedButton";
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -21,100 +23,99 @@ export const Login: React.FC = () => {
 
     try {
       await login(email, password);
-      toast.success('Login successful!');
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error('Invalid email or password');
+      toast.success("Login successful!");
+      navigate("/dashboard");
+    } catch {
+      toast.error("Invalid email or password");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center text-center mb-8">
-          <Logo variant="full" size={56} wordmarkClassName="text-4xl" />
-          <p className="text-[var(--text-secondary)] mt-3">Financial Insights & Secure Reporting</p>
-        </div>
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to continue to your FINSURE dashboard."
+      footer={
+        <>
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            className="text-[color:var(--accent)] hover:text-[color:var(--accent-hover)] font-medium transition-colors"
+          >
+            Create one
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          icon={<Mail size={18} />}
+          placeholder="you@company.com"
+          autoComplete="email"
+        />
 
-        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-8 shadow-xl">
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6">Welcome Back</h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]" size={20} />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-4 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
-                  placeholder="your.email@example.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                Password
-              </label>
-
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
-                  size={20}
-                />
-
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] pl-10 pr-12 py-3 rounded-lg border border-[var(--border-color)] focus:border-[#14e7ff] focus:outline-none transition-colors"
-                  placeholder="••••••••"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[#14e7ff]"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
+        <AuthField
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          icon={<Lock size={18} />}
+          placeholder="••••••••"
+          autoComplete="current-password"
+          trailing={
             <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#0ab6ff] hover:bg-[#14e7ff] text-[#0c111a] py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="w-8 h-8 flex items-center justify-center rounded-full text-[var(--text-secondary)] hover:text-[color:var(--accent)] hover:bg-[color:var(--accent-soft)] transition-colors"
             >
-              {isLoading ? (
-                <>
-                  <Loader className="animate-spin" size={20} />
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                'Sign In'
-              )}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
-          </form>
+          }
+        />
 
-          <div className="mt-6 text-center">
-            <p className="text-[var(--text-secondary)] text-sm">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-[#14e7ff] hover:text-[#0ab6ff] transition-colors">
-                Sign up
-              </Link>
-            </p>
-          </div>
+        <div className="flex items-center justify-between text-sm">
+          <label className="flex items-center gap-2 text-[var(--text-secondary)] cursor-pointer select-none">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded accent-[color:var(--accent)]"
+            />
+            Remember me
+          </label>
+          <button
+            type="button"
+            className="text-[color:var(--accent)] hover:text-[color:var(--accent-hover)] transition-colors"
+            onClick={() =>
+              toast.info("Password reset coming soon — email support@finsure.app")
+            }
+          >
+            Forgot password?
+          </button>
         </div>
-      </div>
-    </div>
+
+        <AnimatedButton
+          type="submit"
+          size="md"
+          className="w-full"
+          disabled={isLoading}
+          trailingIcon={
+            isLoading ? (
+              <Loader className="animate-spin" size={16} />
+            ) : (
+              <ArrowRight size={16} />
+            )
+          }
+        >
+          {isLoading ? "Signing in…" : "Sign in"}
+        </AnimatedButton>
+      </form>
+    </AuthShell>
   );
 };

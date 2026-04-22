@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { askChatbot, ChatTurn } from "./chatApi";
+import { useAuth } from "../../contexts/AuthContext";
 
 /** Single message stored in the UI - adds id and timestamps on top of the wire format. */
 export interface ChatMessage extends ChatTurn {
@@ -31,8 +32,14 @@ interface ChatbotContextValue {
 
 const ChatbotContext = createContext<ChatbotContextValue | null>(null);
 
-const STORAGE_KEY = "finsure.chatbot.messages";
+// Per-user storage keys — two users on the same browser must never see each
+// other's chats. Legacy key is migrated once into the current user's bucket.
+const STORAGE_PREFIX = "finsure.chatbot.messages";
+const LEGACY_KEY = "finsure.chatbot.messages";
 const HISTORY_WINDOW = 6; // how many recent turns to send to the backend
+
+const storageKeyFor = (userId: string | null | undefined) =>
+  `${STORAGE_PREFIX}:${userId ?? "anon"}`;
 
 const makeId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -47,14 +54,30 @@ const greeting = (): ChatMessage => ({
   createdAt: Date.now(),
 });
 
-function loadInitial(): ChatMessage[] {
+function loadForUser(userId: string | null | undefined): ChatMessage[] {
   if (typeof window === "undefined") return [greeting()];
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [greeting()];
-    const parsed = JSON.parse(raw) as ChatMessage[];
-    if (!Array.isArray(parsed) || parsed.length === 0) return [greeting()];
-    return parsed;
+    const key = storageKeyFor(userId);
+    const raw = window.localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ChatMessage[];
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+    // One-time migration for the first authenticated user on this browser:
+    // only honor the legacy global key if no per-user record exists yet. It is
+    // then removed so other accounts on this device can't inherit it.
+    if (userId) {
+      const legacy = window.localStorage.getItem(LEGACY_KEY);
+      if (legacy) {
+        window.localStorage.removeItem(LEGACY_KEY);
+        const parsed = JSON.parse(legacy) as ChatMessage[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          window.localStorage.setItem(key, legacy);
+          return parsed;
+        }
+      }
+    }
+    return [greeting()];
   } catch {
     return [greeting()];
   }
@@ -63,20 +86,42 @@ function loadInitial(): ChatMessage[] {
 export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(loadInitial);
+  const { user } = useAuth();
+  const userId = user?.userID ?? null;
+
+  const [messages, setMessages] = useState<ChatMessage[]>(() =>
+    loadForUser(userId),
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [unread, setUnread] = useState(0);
   const inflight = useRef<AbortController | null>(null);
+  const activeUserRef = useRef<string | null>(userId);
 
-  // Persist conversation.
+  // When the logged-in user changes (login / logout / account switch), swap
+  // the conversation to that user's private history so one account never
+  // sees another's turns.
+  useEffect(() => {
+    if (activeUserRef.current === userId) return;
+    activeUserRef.current = userId;
+    inflight.current?.abort();
+    inflight.current = null;
+    setIsSending(false);
+    setUnread(0);
+    setMessages(loadForUser(userId));
+  }, [userId]);
+
+  // Persist conversation into the current user's bucket.
   useEffect(() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      window.localStorage.setItem(
+        storageKeyFor(userId),
+        JSON.stringify(messages),
+      );
     } catch {
       // ignore quota errors
     }
-  }, [messages]);
+  }, [messages, userId]);
 
   const open = useCallback(() => {
     setIsOpen(true);
