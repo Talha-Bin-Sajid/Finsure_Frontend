@@ -156,7 +156,7 @@ export const banksApi = {
 export const reportsApi = {
   // Get all reports
   getAll: async () => {
-    const res = await apiClient.get("/api/v1/reports");
+    const res = await apiClient.get("/api/v1/reports/");
     // BE returns {success:false} (no reports key) for users with no reports
     // yet — normalize to [] so the caller can always .map() safely.
     return res.data?.reports ?? [];
