@@ -144,10 +144,94 @@ export interface Bank {
   requiresPassword: boolean;
 }
 
+export interface DemoTransaction {
+  id: number;
+  date: string;
+  description: string;
+  amount: number;
+  trxType: string;
+  category: string;
+  categorizedBy?: string | null;
+}
+
+export interface DemoCategoryBreakdownItem {
+  name: string;
+  type: "income" | "expense";
+  amount: number;
+  transactionCount: number;
+  percentage: number;
+}
+
+export interface DemoReport {
+  reportId: string;
+  type: "category_breakdown";
+  title: string;
+  dateRange: string;
+  generatedDate: string;
+  summary: {
+    totalIncome: number;
+    totalExpenses: number;
+    categoriesCount: number;
+    topExpenseCategory: string;
+    topExpenseAmount: number;
+    topIncomeCategory: string;
+    topIncomeAmount: number;
+  };
+  categoryBreakdown: DemoCategoryBreakdownItem[];
+  transactions: Array<{
+    id: number;
+    date: string;
+    amount: number;
+    type: "income" | "expense";
+    category: string;
+    description?: string;
+    categorizedBy?: string | null;
+  }>;
+}
+
+export interface DemoStatementResult {
+  bank: string;
+  filename: string;
+  accountNumber?: string | null;
+  totalTransactions: number;
+  totalPages: number;
+  transactions: DemoTransaction[];
+  report: DemoReport;
+}
+
 export const banksApi = {
   getAll: async (): Promise<Bank[]> => {
     const res = await apiClient.get("/api/v1/banks");
     return res.data?.banks ?? [];
+  },
+};
+
+export const demoApi = {
+  uploadStatement: async (
+    file: File,
+    bank: { slug: string; isMobileWallet: boolean },
+    password?: string | null
+  ): Promise<DemoStatementResult> => {
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("bank_name", bank.slug);
+    formData.append(
+      "file_type",
+      bank.isMobileWallet ? "mobile_wallet_statement" : "bank_statement"
+    );
+
+    if (password) {
+      formData.append("password", password);
+    }
+
+    const res = await apiClient.post("/api/v1/demo/statement", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res.data;
   },
 };
 
@@ -187,7 +271,7 @@ export const reportsApi = {
   },
 
   // Download PDF (future backend)
-  downloadReportPDF: async (reportId: string) => {
+  downloadReportPDF: async (_reportId: string) => {
     await delay(500);
     return { success: true };
   },
@@ -236,7 +320,7 @@ export const mockApi = {
       }
       throw new Error("Invalid credentials");
     },
-    signup: async (email: string, password: string, name: string) => {
+    signup: async (email: string, _password: string, name: string) => {
       await delay(1000);
       const newUser = {
         id: String(mockData.users.length + 1),
@@ -339,7 +423,7 @@ export const mockApi = {
       return extraction || { id: fileId, fileId, transactions: [] };
     },
     updateTransaction: async (
-      fileId: string,
+      _fileId: string,
       transactionId: string,
       updates: any
     ) => {
@@ -397,7 +481,7 @@ export const mockApi = {
       }
       return detailedReport;
     },
-    downloadReportPDF: async (reportId: string) => {
+    downloadReportPDF: async (_reportId: string) => {
       await delay(1000);
       // Backend endpoint: /api/v1/reports/${reportId}/download
       return { success: true, message: "Report download initiated" };
@@ -410,7 +494,7 @@ export const mockApi = {
     },
   },
   history: {
-    getAll: async (filters?: any) => {
+    getAll: async (_filters?: any) => {
       await delay(600);
       return mockData.history;
     },

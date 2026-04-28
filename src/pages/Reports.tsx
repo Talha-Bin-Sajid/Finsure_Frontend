@@ -489,14 +489,7 @@ interface DetailedReport {
 /* ===================== COMPONENT ===================== */
 
 export const Reports: React.FC = () => {
-  const { theme } = useTheme();
-
-  // Theme-aware colors (same pattern as Dashboards)
-  const bgPrimary = "var(--bg-primary)";
-  const bgSecondary = "var(--bg-secondary)";
-  const borderColor = "var(--border-color)";
-  const textPrimary = "var(--text-primary)";
-  const textSecondary = "var(--text-secondary)";
+  useTheme();
 
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -16,6 +16,7 @@ import { extractionApi } from "../services/apiClient";
 import { toast } from "../utils/toast";
 import { AnimatedButton } from "../components/ui/AnimatedButton";
 import { HorizontalScroller } from "../components/ui/HorizontalScroller";
+import { getCategoryBadgeClassName } from "../utils/categoryStyles";
 
 interface Transaction {
   id: string;
@@ -93,13 +94,12 @@ export const ExtractionReview: React.FC = () => {
   };
 
   const exportToCSV = () => {
-    const headers = ["Date", "Amount", "Type", "Category", "Taxable"];
+    const headers = ["Date", "Amount", "Type", "Category"];
     const rows = transactions.map((t) => [
       t.date,
       isIncome(t) ? `+${t.amount.toFixed(2)}` : `-${t.amount.toFixed(2)}`,
       isIncome(t) ? "Income" : "Expense",
       `"${(t.category || "Uncategorized").replace(/"/g, '""')}"`,
-      t.taxable ? "Yes" : "No",
     ]);
     const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -246,7 +246,7 @@ export const ExtractionReview: React.FC = () => {
           <table className="w-full min-w-[640px]">
             <thead className="bg-[var(--bg-primary)]/70 border-b border-[var(--border-color)]">
               <tr>
-                {["Date", "Amount", "Type", "Category", "Taxable", "Actions"].map(
+                {["Date", "Amount", "Type", "Category", "Actions"].map(
                   (h) => (
                     <th
                       key={h}
@@ -348,38 +348,11 @@ export const ExtractionReview: React.FC = () => {
                           </select>
                         ) : (
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
-                              transaction.category === "Uncategorized"
-                                ? "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border-[var(--border-color)]"
-                                : "bg-[color:var(--accent-soft)] text-[color:var(--accent)] border-[color:var(--accent-ring)]"
-                            }`}
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium border max-w-[160px] truncate overflow-hidden whitespace-nowrap ${getCategoryBadgeClassName(
+                              transaction.category
+                            )}`}
                           >
                             {transaction.category}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-3">
-                        {editing ? (
-                          <input
-                            type="checkbox"
-                            checked={editForm.taxable}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                taxable: e.target.checked,
-                              })
-                            }
-                            className="w-4 h-4 accent-[color:var(--accent)]"
-                          />
-                        ) : (
-                          <span
-                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
-                              transaction.taxable
-                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border-[var(--border-color)]"
-                            }`}
-                          >
-                            {transaction.taxable ? "Yes" : "No"}
                           </span>
                         )}
                       </td>
