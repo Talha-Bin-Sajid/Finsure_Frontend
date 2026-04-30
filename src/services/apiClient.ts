@@ -52,6 +52,52 @@ export const authApi = {
   },
 };
 
+export const twoFactorApi = {
+  getStatus: async () => {
+    const res = await apiClient.get("/api/v1/auth/2fa/status");
+    return res.data;
+  },
+  startSetup: async () => {
+    const res = await apiClient.post("/api/v1/auth/2fa/setup");
+    return res.data;
+  },
+  verifySetup: async (data: { code: string }) => {
+    const res = await apiClient.post("/api/v1/auth/2fa/setup/verify", data);
+    return res.data;
+  },
+  verifyLogin: async (data: {
+    code?: string;
+    backup_code?: string;
+    twoFactorToken: string;
+  }) => {
+    const res = await apiClient.post(
+      "/api/v1/auth/2fa",
+      { code: data.code, backup_code: data.backup_code },
+      {
+        headers: {
+          Authorization: `Bearer ${data.twoFactorToken}`,
+        },
+      }
+    );
+    return res.data;
+  },
+  disable: async (data: {
+    password: string;
+    code?: string;
+    backup_code?: string;
+  }) => {
+    const res = await apiClient.delete("/api/v1/auth/2fa", { data });
+    return res.data;
+  },
+  regenerateBackupCodes: async (data: { password: string; code: string }) => {
+    const res = await apiClient.post(
+      "/api/v1/auth/2fa/backup-codes/regenerate",
+      data
+    );
+    return res.data;
+  },
+};
+
 // ================= UPLOAD API =================
 export const uploadApi = {
   /**

@@ -5,7 +5,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { authApi } from "../services/apiClient";
+import { authApi, twoFactorApi } from "../services/apiClient";
 
 interface User {
   userID: string;
@@ -19,7 +19,15 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ requires2fa: boolean; twoFactorToken?: string }>;
+  completeTwoFactorLogin: (data: {
+    twoFactorToken: string;
+    code?: string;
+    backupCode?: string;
+  }) => Promise<void>;
   signup: (
     email: string,
     password: string,
@@ -68,9 +76,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const res = await authApi.login({ email, password });
-
+  const applyAuthSession = (res: any) => {
     const userWithAvatar: User = {
       ...res.user,
       avatar: generateAvatar(res.user.name),
@@ -79,6 +85,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.setItem("authToken", res.access_token);
     localStorage.setItem("user", JSON.stringify(userWithAvatar));
     setUser(userWithAvatar);
+  };
+
+  const login = async (email: string, password: string) => {
+    const res = await authApi.login({ email, password });
+
+    if (res.requires_2fa) {
+      return { requires2fa: true, twoFactorToken: res.two_factor_token };
+    }
+
+    applyAuthSession(res);
+    return { requires2fa: false };
+  };
+
+  const completeTwoFactorLogin = async (data: {
+    twoFactorToken: string;
+    code?: string;
+    backupCode?: string;
+  }) => {
+    const res = await twoFactorApi.verifyLogin({
+      twoFactorToken: data.twoFactorToken,
+      code: data.code,
+      backup_code: data.backupCode,
+    });
+    applyAuthSession(res);
   };
 
   const signup = async (
@@ -94,14 +124,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       userType,
     });
 
-    const userWithAvatar: User = {
-      ...res.user,
-      avatar: generateAvatar(res.user.name),
-    };
-
-    localStorage.setItem("authToken", res.access_token);
-    localStorage.setItem("user", JSON.stringify(userWithAvatar));
-    setUser(userWithAvatar);
+    applyAuthSession(res);
   };
 
   const logout = () => {
@@ -121,6 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         user,
         isAuthenticated: !!user,
         login,
+        completeTwoFactorLogin,
         signup,
         logout,
         updateUser,
